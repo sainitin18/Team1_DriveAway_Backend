@@ -1,9 +1,6 @@
 package com.DriveAway.project.dto;
 
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -19,7 +16,7 @@ public class VehicleDTO {
     private String type;
 
     @NotNull(message = "Year is required")
-    @Min(value = 1886, message = "Invalid year") // Cars were invented around 1886
+    @Min(value = 1886, message = "Invalid year, must be after 1886")
     private Integer year;
 
     @NotBlank(message = "Fuel type is required")
@@ -41,9 +38,9 @@ public class VehicleDTO {
     @NotBlank(message = "Color is required")
     private String color;
 
-    @NotNull(message = "Seater count is required")
-    @Min(value = 2, message = "Seater must be at least 2")
-    private Integer seater;
+    @NotBlank(message = "Seater count is required")
+    @Pattern(regexp = "^(2|5|7)$", message = "Seater must be 2,  5, or 7")
+    private String seater;
 
     @NotNull(message = "Security amount is required")
     @Min(value = 0, message = "Security amount must be non-negative")
