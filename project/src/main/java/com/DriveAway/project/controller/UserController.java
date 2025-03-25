@@ -25,7 +25,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<User> registerUser(@Valid @RequestBody UserDto userDTO) {
         User user = userService.registerUser(userDTO);
         return ResponseEntity.ok(user);
@@ -36,17 +36,17 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PutMapping("/update/{userId}")
+    @PutMapping("/{userId}")
     public ResponseEntity<User> updateUser(@PathVariable Long userId, @Valid @RequestBody UserDto userDTO) {
         return ResponseEntity.ok(userService.updateUser(userId, userDTO));
     }
 
-    @DeleteMapping("/delete/{userId}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.ok("User deleted successfully");
