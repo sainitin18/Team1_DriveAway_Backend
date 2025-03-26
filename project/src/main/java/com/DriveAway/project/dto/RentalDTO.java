@@ -22,7 +22,7 @@ public class RentalDTO {
     @Min(value = 1, message = "Rental period must be at least 1 day")
     private Integer rentalPeriod;
 
-    private String rentalStatus = "pending"; // Default status
+    private String rentalStatus = "Available"; // Default status
 
     @NotNull(message = "Booking date is required")
     private LocalDate bookingDate;

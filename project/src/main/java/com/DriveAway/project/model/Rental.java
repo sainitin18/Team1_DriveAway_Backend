@@ -28,7 +28,7 @@ public class Rental {
     private int rentalPeriod; // Rental duration in days (User input)
 
     @Column(nullable = false)
-    private String rentalStatus = "pending"; // Default status: pending
+    private String rentalStatus = "Available"; // Default status: pending
 
     @Column(nullable = false)
     private LocalDate bookingDate; // Date when user wants to book

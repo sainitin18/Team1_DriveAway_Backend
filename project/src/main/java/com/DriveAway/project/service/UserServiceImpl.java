@@ -11,6 +11,7 @@ import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.repository.UserRepository;
 
+
 @Service
 public class UserServiceImpl implements UserService {
     @Autowired
