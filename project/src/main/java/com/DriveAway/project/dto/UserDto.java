@@ -1,5 +1,6 @@
 package com.DriveAway.project.dto;
 
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -47,4 +48,12 @@ public class UserDto {
 
     @Pattern(regexp = "^[6-9]{1}[0-9]{9}$", message = "Invalid Alternative Mobile number")
     private String altMobileNumber;
+<<<<<<< HEAD
 }
+=======
+    
+    private String role;
+    
+    private String status;
+}
+>>>>>>> 55a26be326657694550b47a9be0759672f9809ec

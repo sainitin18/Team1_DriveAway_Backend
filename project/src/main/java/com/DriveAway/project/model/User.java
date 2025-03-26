@@ -47,4 +47,7 @@ public class User {
 
     @Column(nullable = false)
     private String role = "USER";
+    
+    @Column(nullable = false)
+    private String status = "Pending";
 }
