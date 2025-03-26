@@ -38,9 +38,10 @@ public class VehicleDTO {
     @NotBlank(message = "Color is required")
     private String color;
 
-    @NotBlank(message = "Seater count is required")
-    @Pattern(regexp = "^(2|5|7)$", message = "Seater must be 2,  5, or 7")
-    private String seater;
+    @NotNull(message = "Seater count is required")
+    @Min(value = 2, message = "Seater must be 2, 5, or 7")
+    @Max(value = 7, message = "Seater must be 2, 5, or 7")
+    private int seater;  // Changed from String to Integer
 
     @NotNull(message = "Security amount is required")
     @Min(value = 0, message = "Security amount must be non-negative")
