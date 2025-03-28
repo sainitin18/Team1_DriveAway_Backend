@@ -1,15 +1,11 @@
 package com.DriveAway.project.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "vehicles")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Setter
-@Getter
 public class Vehicle {	  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
