@@ -1,23 +1,23 @@
 package com.DriveAway.project.dto;
 
+import com.DriveAway.project.model.*;
 
-import lombok.*;
+import lombok.Data;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class CarFeaturesDto {
-    private int carId;
-    
+public class CarFeaturesDTO {
+
+    private Long id;
+    private Long vehicleId; // Foreign Key as vehicle ID
     private boolean spareTyre;
     private boolean toolkit;
     private boolean reverseCamera;
     private boolean adas;
     private boolean abs;
     private boolean tractionControl;
-    private boolean frontAirbags;
-    private boolean sideAirbags;
-    private boolean rearAirbags;
+    private boolean twoFrontAirbags;
+    private boolean twoSideAirbags;
+    private boolean twoRearAirbags;
     private boolean powerWindows;
     private boolean powerSteering;
     private boolean airConditioning;

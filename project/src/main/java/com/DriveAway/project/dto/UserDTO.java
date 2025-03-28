@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class UserDto {
+public class UserDTO {
     
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")

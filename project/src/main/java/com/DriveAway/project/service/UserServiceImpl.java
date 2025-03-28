@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.DriveAway.project.dto.UserDto;
+import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.exception.UserAlreadyExistsException;
 import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.User;
@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
 
     @Override
-    public User registerUser(UserDto userDTO) throws UserAlreadyExistsException {
+    public User registerUser(UserDTO userDTO) throws UserAlreadyExistsException {
         if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
             throw new UserAlreadyExistsException("Email already exists");
         }
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long userId, UserDto userDTO) {
+    public User updateUser(Long userId, UserDTO userDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         user.setEmail(userDTO.getEmail());
