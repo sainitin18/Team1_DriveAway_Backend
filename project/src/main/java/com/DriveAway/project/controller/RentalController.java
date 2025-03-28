@@ -1,4 +1,3 @@
-
 package com.DriveAway.project.controller;
 
 import com.DriveAway.project.model.Rental;
