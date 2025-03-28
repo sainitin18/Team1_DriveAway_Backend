@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.DriveAway.project.dto.UserDto;
+import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 
@@ -26,7 +26,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<User> registerUser(@Valid @RequestBody UserDto userDTO) {
+    public ResponseEntity<User> registerUser(@Valid @RequestBody UserDTO userDTO) {
         User user = userService.registerUser(userDTO);
         return ResponseEntity.ok(user);
     }
@@ -42,7 +42,7 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<User> updateUser(@PathVariable Long userId, @Valid @RequestBody UserDto userDTO) {
+    public ResponseEntity<User> updateUser(@PathVariable Long userId, @Valid @RequestBody UserDTO userDTO) {
         return ResponseEntity.ok(userService.updateUser(userId, userDTO));
     }
 
