@@ -1,20 +1,23 @@
 package com.DriveAway.project.model;
 
+
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "car_features")
-@Data
-public class CarFeatures {
+public class CarFeature {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long featureId;
 
-    @ManyToOne
-    @JoinColumn(name = "carId", nullable = false)
-    private Vehicle vehicle; // Foreign Key from Vehicle table
+    @OneToOne
+    @JoinColumn(name = "car_id", nullable = false)
+    private Vehicle vehicle;
 
     private boolean spareTyre;
     private boolean toolkit;
@@ -22,9 +25,9 @@ public class CarFeatures {
     private boolean adas;
     private boolean abs;
     private boolean tractionControl;
-    private boolean twoFrontAirbags;
-    private boolean twoSideAirbags;
-    private boolean twoRearAirbags;
+    private boolean frontAirbags;
+    private boolean sideAirbags;
+    private boolean rearAirbags;
     private boolean powerWindows;
     private boolean powerSteering;
     private boolean airConditioning;
