@@ -50,14 +50,7 @@ public class CarFeatureService {
         return convertToDTO(feature);
     }
 
-    // ✅ Delete Features
-    public String deleteCarFeatures(Long carId) {
-        CarFeature feature = carFeatureRepository.findByVehicle_CarId(carId)
-                .orElseThrow(() -> new RuntimeException("Features not found for Car ID: " + carId));
-
-        carFeatureRepository.delete(feature);
-        return "Car features deleted successfully for Car ID: " + carId;
-    }
+   
 
     // ✅ Helper method to set features
     private void setFeatures(CarFeature feature, CarFeatureDTO carFeatureDTO) {

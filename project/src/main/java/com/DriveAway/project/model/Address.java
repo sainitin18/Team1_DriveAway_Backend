@@ -1,7 +1,5 @@
 package com.DriveAway.project.model;
 
-
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +11,7 @@ import lombok.*;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // ✅ Ensure ID is auto-generated
     private Long addressId; // Primary Key
 
     @Column(nullable = false)
@@ -31,7 +29,7 @@ public class Address {
     @Column(nullable = false)
     private String country;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false) // Foreign Key linking to User
     private User user;
 }

@@ -1,6 +1,5 @@
 package com.DriveAway.project.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
@@ -8,7 +7,7 @@ import lombok.Data;
 @Data
 public class AddressDTO {
 
-    private Long addressId;  // Primary key (auto-generated)
+    private Long addressId;  // ✅ ID will be returned in responses
 
     @NotBlank(message = "Street is required")
     private String street;

@@ -22,10 +22,10 @@ public class AddressService {
     @Autowired
     private UserRepository userRepository;
 
-    // Convert Entity to DTO
+    // ✅ Convert Entity to DTO
     private AddressDTO convertToDTO(Address address) {
         AddressDTO dto = new AddressDTO();
-        dto.setAddressId(address.getAddressId());
+        dto.setAddressId(address.getAddressId()); // ✅ Ensure ID is set
         dto.setStreet(address.getStreet());
         dto.setCity(address.getCity());
         dto.setState(address.getState());
@@ -35,10 +35,9 @@ public class AddressService {
         return dto;
     }
 
-    // Convert DTO to Entity
+    // ✅ Convert DTO to Entity
     private Address convertToEntity(AddressDTO dto, User user) {
         Address address = new Address();
-        address.setAddressId(dto.getAddressId());
         address.setStreet(dto.getStreet());
         address.setCity(dto.getCity());
         address.setState(dto.getState());
@@ -48,7 +47,7 @@ public class AddressService {
         return address;
     }
 
-    // Add a new address
+    // ✅ Add a new address
     public AddressDTO addAddress(AddressDTO addressDTO) {
         Optional<User> userOptional = userRepository.findById(addressDTO.getUserId());
         if (userOptional.isEmpty()) {
@@ -57,21 +56,27 @@ public class AddressService {
 
         Address address = convertToEntity(addressDTO, userOptional.get());
         Address savedAddress = addressRepository.save(address);
+
+        System.out.println("Saved Address ID: " + savedAddress.getAddressId()); // 🔍 DEBUG
+
         return convertToDTO(savedAddress);
     }
 
-    // Get all addresses for a user
+    // ✅ Get all addresses for a user
     public List<AddressDTO> getAddressesByUserId(Long userId) {
         List<Address> addresses = addressRepository.findByUserUserId(userId);
         return addresses.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
-    // Delete an address by ID
+    // ✅ Delete an address by ID
     public void deleteAddress(Long addressId) {
+        if (!addressRepository.existsById(addressId)) {
+            throw new RuntimeException("Address not found with id: " + addressId);
+        }
         addressRepository.deleteById(addressId);
     }
 
-    // 🔹 Update an existing address
+    // ✅ Update an existing address
     public AddressDTO updateAddress(Long addressId, AddressDTO addressDTO) {
         Optional<Address> existingAddressOptional = addressRepository.findById(addressId);
         if (existingAddressOptional.isEmpty()) {

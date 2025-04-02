@@ -32,9 +32,5 @@ public class CarFeatureController {
         return ResponseEntity.ok(carFeatureService.getCarFeatures(carId));
     }
 
-    // ✅ Delete Features
-    @DeleteMapping("/{carId}")
-    public ResponseEntity<String> deleteCarFeatures(@PathVariable Long carId) {
-        return ResponseEntity.ok(carFeatureService.deleteCarFeatures(carId));
-    }
+    
 }
