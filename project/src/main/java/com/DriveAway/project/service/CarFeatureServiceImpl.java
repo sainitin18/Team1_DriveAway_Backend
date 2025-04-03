@@ -11,7 +11,7 @@ import com.DriveAway.project.repository.VehicleRepository;
 import java.util.Optional;
 
 @Service
-public class CarFeatureService {
+public class CarFeatureServiceImpl implements CarFeatureService {
 
     @Autowired
     private CarFeatureRepository carFeatureRepository;
@@ -19,7 +19,7 @@ public class CarFeatureService {
     @Autowired
     private VehicleRepository vehicleRepository;
 
-    // ✅ Add Features
+    // Add Features
     public CarFeatureDTO addCarFeatures(CarFeatureDTO carFeatureDTO) {
         Vehicle vehicle = vehicleRepository.findById(carFeatureDTO.getCarId())
                 .orElseThrow(() -> new RuntimeException("Vehicle not found with ID: " + carFeatureDTO.getCarId()));
@@ -32,7 +32,7 @@ public class CarFeatureService {
         return convertToDTO(savedFeature);
     }
 
-    // ✅ Update Features
+    // Update Features
     public CarFeatureDTO updateCarFeatures(Long carId, CarFeatureDTO carFeatureDTO) {
         CarFeature feature = carFeatureRepository.findByVehicle_CarId(carId)
                 .orElseThrow(() -> new RuntimeException("Features not found for Car ID: " + carId));
@@ -42,7 +42,7 @@ public class CarFeatureService {
         return convertToDTO(updatedFeature);
     }
 
-    // ✅ Get Features (Only "Yes" Features)
+    // Get Features (Only "Yes" Features)
     public CarFeatureDTO getCarFeatures(Long carId) {
         CarFeature feature = carFeatureRepository.findByVehicle_CarId(carId)
                 .orElseThrow(() -> new RuntimeException("Features not found for Car ID: " + carId));
@@ -52,7 +52,7 @@ public class CarFeatureService {
 
    
 
-    // ✅ Helper method to set features
+    // Helper method to set features
     private void setFeatures(CarFeature feature, CarFeatureDTO carFeatureDTO) {
         feature.setSpareTyre(carFeatureDTO.isSpareTyre());
         feature.setToolkit(carFeatureDTO.isToolkit());
@@ -83,7 +83,7 @@ public class CarFeatureService {
         feature.setSixAirbags(carFeatureDTO.isSixAirbags());
     }
 
-    // ✅ Convert Entity to DTO (Only "Yes" Features)
+    // Convert Entity to DTO (Only "Yes" Features)
     private CarFeatureDTO convertToDTO(CarFeature feature) {
         CarFeatureDTO dto = new CarFeatureDTO();
         dto.setCarId(feature.getVehicle().getCarId());
