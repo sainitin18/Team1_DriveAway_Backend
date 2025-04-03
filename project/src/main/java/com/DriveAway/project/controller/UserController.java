@@ -51,4 +51,10 @@ public class UserController {
         userService.deleteUser(userId);
         return ResponseEntity.ok("User deleted successfully");
     }
+    
+    @PutMapping("updateUserStatus/{userId}")
+    public ResponseEntity<String> updateUserStatus(@PathVariable Long userId,@Valid @RequestBody UserDTO request) {
+        userService.updateUserStatus(userId, request.getStatus());
+        return ResponseEntity.ok("User status updated successfully");
+    }
 }
