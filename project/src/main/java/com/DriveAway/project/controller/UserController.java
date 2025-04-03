@@ -57,4 +57,15 @@ public class UserController {
         userService.updateUserStatus(userId, request.getStatus());
         return ResponseEntity.ok("User status updated successfully");
     }
+    
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+        boolean isAuthenticated = userService.authenticateUser(userDTO.getEmail(), userDTO.getPassword());
+
+        if (isAuthenticated) {
+            return ResponseEntity.ok("Login successful!");
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials!");
+        }
+    }
 }

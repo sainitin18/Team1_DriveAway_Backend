@@ -3,8 +3,8 @@ package com.DriveAway.project.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.exception.UserAlreadyExistsException;
 import com.DriveAway.project.exception.UserNotFoundException;
@@ -16,6 +16,9 @@ import com.DriveAway.project.repository.UserRepository;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public User registerUser(UserDTO userDTO) throws UserAlreadyExistsException {
@@ -25,7 +28,11 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setEmail(userDTO.getEmail());
         user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword());
+        
+        // Encrypt the password before saving
+        String encryptedPassword = passwordEncoder.encode(userDTO.getPassword());
+        user.setPassword(encryptedPassword);
+        
         user.setAadharNumber(userDTO.getAadharNumber());
         user.setDrivingLicense(userDTO.getDrivingLicense());
         user.setMobileNumber(userDTO.getMobileNumber());
@@ -50,7 +57,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
         user.setEmail(userDTO.getEmail());
         user.setUsername(userDTO.getUsername());
-        user.setPassword(userDTO.getPassword());
+        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
         user.setAadharNumber(userDTO.getAadharNumber());
         user.setDrivingLicense(userDTO.getDrivingLicense());
         user.setMobileNumber(userDTO.getMobileNumber());
@@ -72,5 +79,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 		user.setStatus(newUserStatus);
         userRepository.save(user);;
+	}
+	
+	public boolean authenticateUser(String email, String rawPassword) {	    
+	    User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+	    // Compare entered password with the hashed password in DB
+	    return passwordEncoder.matches(rawPassword, user.getPassword());
 	}
 }
