@@ -11,8 +11,8 @@ import lombok.*;
 public class Address {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // ✅ Ensure ID is auto-generated
-    private Long addressId; // Primary Key
+    @GeneratedValue(strategy = GenerationType.IDENTITY) 
+    private Long addressId; 
 
     @Column(nullable = false)
     private String street;
@@ -30,6 +30,6 @@ public class Address {
     private String country;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false) // Foreign Key linking to User
+    @JoinColumn(name = "user_id", nullable = false) 
     private User user;
 }

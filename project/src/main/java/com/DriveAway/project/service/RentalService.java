@@ -1,24 +1,51 @@
-
+//package com.DriveAway.project.service;
+//
+//import com.DriveAway.project.dto.RentalDTO;
+//
+//import java.util.List;
+//
+//public interface RentalService {
+//    
+//    List<RentalDTO> getUserBookingsByStatus(Long userId, String status);
+//
+//    List<RentalDTO> getNewBookingsForAdmin();
+//
+//    List<RentalDTO> getApprovedBookingsForAdmin();
+//
+//    List<RentalDTO> getOngoingRentalsForAdmin();
+//
+//    List<RentalDTO> getCompletedRentalsForAdmin();
+//
+//    int getRentalCountByCarIdAndStatus(Long carId, String status);
+//
+//    boolean hasPendingBooking(Long userId, Long carId);
+//
+//    RentalDTO createBooking(RentalDTO rentalDTO);
+//
+//    void acceptBooking(Long id);
+//
+//    void declineBooking(Long id);
+//
+//    void completeRental(Long id);
+//
+//    void cancelBooking(Long id);
+//}
 package com.DriveAway.project.service;
 
-import com.DriveAway.project.model.Rental;
+import com.DriveAway.project.dto.RentalDTO;
 import java.util.List;
 
 public interface RentalService {
-    
-   
-    Rental createRental(Rental rental);
-
-    Rental getRentalById(Long rentalId);
-
-    List<Rental> getAllRentals();
-
-    List<Rental> getRentalsByUserId(Long userId);
-
- 
-    List<Rental> getRentalsByCarId(Long carId);
-
-    Rental updateRentalStatus(Long rentalId, String status);
-
-    void deleteRental(Long rentalId);
+    List<RentalDTO> getUserBookingsByStatus(Long userId, String status);
+    List<RentalDTO> getNewBookingsForAdmin();
+    List<RentalDTO> getApprovedBookingsForAdmin();
+    List<RentalDTO> getOngoingRentalsForAdmin();
+    List<RentalDTO> getCompletedRentalsForAdmin();
+    int getRentalCountByCarIdAndStatus(Long carId, String status);
+    boolean hasPendingBooking(Long userId, Long carId);
+    RentalDTO createBooking(RentalDTO rentalDTO);
+    void acceptBooking(Long id);
+    void declineBooking(Long id);
+    void completeRental(Long id);
+    void cancelBooking(Long id);
 }

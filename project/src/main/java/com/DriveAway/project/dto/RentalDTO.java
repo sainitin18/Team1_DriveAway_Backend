@@ -1,38 +1,49 @@
+//package com.DriveAway.project.dto;
+//
+//import lombok.Data;
+//
+//import java.time.LocalDate;
+//import java.time.LocalDateTime;
+//import java.time.LocalTime;
+//
+//@Data
+//public class RentalDTO {
+//    private Long id;
+//    private Long userId;
+//    private Long carId;
+//    private int rentalPeriod;
+//    private String rentalStatus;
+//    private LocalDate bookingDate;
+//    private LocalTime bookingTime;
+//    private LocalDateTime createdTime;
+//    private LocalDateTime expiryTime;
+//    private Integer securityAmount;
+//    private Integer paymentAmount;
+//}
+//
 package com.DriveAway.project.dto;
 
-
-import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import java.math.BigDecimal;
+import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class RentalDTO {
-
-    private Long rentalId; // Auto-generated
-
-    @NotNull(message = "User ID is required")
+    private Long id;
     private Long userId;
-
-    @NotNull(message = "Car ID is required")
     private Long carId;
-
-    @NotNull(message = "Rental period is required")
-    @Min(value = 1, message = "Rental period must be at least 1 day")
-    private Integer rentalPeriod;
-
-    private String rentalStatus = "Available"; // Default status
-
-    @NotNull(message = "Booking date is required")
+    private int rentalPeriod;
+    private String rentalStatus;
     private LocalDate bookingDate;
-
-    @NotNull(message = "Booking time is required")
     private LocalTime bookingTime;
-
-    private LocalDate createdTime = LocalDate.now(); // Auto-generated
-
-    private LocalDate expiryTime; // Auto-generated in logic
-
-    private BigDecimal paymentAmount; // Calculated in business logic
+    private LocalDateTime createdTime;
+    private LocalDateTime expiryTime;
+    private Integer securityAmount;
+    private Integer paymentAmount;
 }

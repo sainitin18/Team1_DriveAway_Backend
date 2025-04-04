@@ -1,55 +1,52 @@
 package com.DriveAway.project.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "rentals")
 @Data
+
 public class Rental {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long rentalId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;  // Foreign Key (User who rented)
+    private User user; // Represents the user who booked the car
 
     @ManyToOne
-    @JoinColumn(name = "car_id", nullable = false)
-    private Vehicle vehicle; // Foreign Key (Selected Vehicle)
+    @JoinColumn(name = "car_id", nullable = false, referencedColumnName = "carId")
+    private Vehicle car ; // Represents the rented car
 
     @Column(nullable = false)
-    private int rentalPeriod; // Rental duration in days (User input)
+    private int rentalPeriod; // Rental duration (e.g., in days or hours)
 
     @Column(nullable = false)
-    private String rentalStatus = "Available"; // Default status: pending
+    private String rentalStatus; // Status (Pending, Confirmed, Completed, Cancelled)
+
+    private LocalDate bookingDate;
+    private LocalTime bookingTime;
 
     @Column(nullable = false)
-    private LocalDate bookingDate; // Date when user wants to book
+    private LocalDateTime createdTime; // Auto-assigned at creation
+
+    private LocalDateTime expiryTime; // 15-minute expiry rule
 
     @Column(nullable = false)
-    private String bookingTime; // Time when user wants to pick up car
+    private Integer securityAmount; // New field: amount to be paid before booking
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdTime = LocalDateTime.now(); // Auto-generated requested time
+    private Integer paymentAmount; // Final rental payment
 
-    @Column(nullable = false)
-    private LocalDateTime expiryTime; // Auto-generated expiry time
-
-    @Column(nullable = false)
-    private double paymentAmount; // (rentalPeriod * price) + securityAmount
-
-    // Calculate expiry time (booking date + rental period)
-    public void calculateExpiryTime() {
-        this.expiryTime = bookingDate.atStartOfDay().plusDays(rentalPeriod);
-    }
-
-    // Calculate total payment amount
-    public void calculatePaymentAmount() {
-        this.paymentAmount = (rentalPeriod * vehicle.getPrice()) + vehicle.getSecurityAmount();
+    @PrePersist
+    private void prePersist() {
+        this.createdTime = LocalDateTime.now();
+        this.expiryTime = this.createdTime.plusMinutes(15);
     }
 }
