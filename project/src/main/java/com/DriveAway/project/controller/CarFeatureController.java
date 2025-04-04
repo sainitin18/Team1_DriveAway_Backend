@@ -5,14 +5,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.DriveAway.project.dto.CarFeatureDTO;
-import com.DriveAway.project.service.CarFeatureService;
+import com.DriveAway.project.service.CarFeatureServiceImpl;
 
 @RestController
 @RequestMapping("/car-features")
 public class CarFeatureController {
 
     @Autowired
-    private CarFeatureService carFeatureService;
+    private CarFeatureServiceImpl carFeatureService;
 
     // ✅ Add Features
     @PostMapping

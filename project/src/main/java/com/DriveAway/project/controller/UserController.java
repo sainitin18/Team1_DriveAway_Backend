@@ -51,4 +51,21 @@ public class UserController {
         userService.deleteUser(userId);
         return ResponseEntity.ok("User deleted successfully");
     }
+    
+    @PutMapping("updateUserStatus/{userId}")
+    public ResponseEntity<String> updateUserStatus(@PathVariable Long userId,@Valid @RequestBody UserDTO request) {
+        userService.updateUserStatus(userId, request.getStatus());
+        return ResponseEntity.ok("User status updated successfully");
+    }
+    
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+        boolean isAuthenticated = userService.authenticateUser(userDTO.getEmail(), userDTO.getPassword());
+
+        if (isAuthenticated) {
+            return ResponseEntity.ok("Login successful!");
+        } else {
+            return ResponseEntity.status(401).body("Invalid credentials!");
+        }
+    }
 }

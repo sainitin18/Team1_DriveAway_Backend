@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.DriveAway.project.dto.AddressDTO;
-import com.DriveAway.project.service.AddressService;
+import com.DriveAway.project.service.AddressServiceImpl;
 
 import jakarta.validation.Valid;
 
@@ -16,7 +16,7 @@ import jakarta.validation.Valid;
 public class AddressController {
 
     @Autowired
-    private AddressService addressService;
+    private AddressServiceImpl addressService;
 
     // ✅ Add a new address
     @PostMapping
