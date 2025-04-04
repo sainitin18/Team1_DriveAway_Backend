@@ -2,9 +2,12 @@ package com.DriveAway.project.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+
 public class AddressDTO {
 
     private Long addressId;  // ✅ ID will be returned in responses
@@ -29,4 +32,7 @@ public class AddressDTO {
     private String country;
 
     private Long userId; // Foreign key reference to User
+    
+    
+    
 }
