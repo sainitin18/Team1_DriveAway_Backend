@@ -74,11 +74,11 @@
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
-		<!-- <dependency>
+		<dependency>
 		    <groupId>org.modelmapper</groupId>
 		    <artifactId>modelmapper</artifactId>
 		    <version>3.2.2</version>
-		</dependency> -->
+		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
 		<dependency>

@@ -57,7 +57,7 @@ public class AddressServiceImpl implements AddressService {
         Address address = convertToEntity(addressDTO, userOptional.get());
         Address savedAddress = addressRepository.save(address);
 
-        System.out.println("Saved Address ID: " + savedAddress.getAddressId()); // 🔍 DEBUG
+        System.out.println("Saved Address ID: " + savedAddress.getAddressId());
 
         return convertToDTO(savedAddress);
     }

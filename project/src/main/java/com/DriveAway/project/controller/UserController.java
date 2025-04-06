@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.DriveAway.project.dto.UserDTO;
+import com.DriveAway.project.dto.UserLoginDTO;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -59,8 +60,8 @@ public class UserController {
     }
     
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
-        boolean isAuthenticated = userService.authenticateUser(userDTO.getEmail(), userDTO.getPassword());
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+        boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
 
         if (isAuthenticated) {
             return ResponseEntity.ok("Login successful!");
