@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.DriveAway.project.dto.UpdateUserStatusDTO;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.dto.UserLoginDTO;
 import com.DriveAway.project.model.User;
@@ -54,8 +55,8 @@ public class UserController {
     }
     
     @PutMapping("updateUserStatus/{userId}")
-    public ResponseEntity<String> updateUserStatus(@PathVariable Long userId,@Valid @RequestBody UserDTO request) {
-        userService.updateUserStatus(userId, request.getStatus());
+    public ResponseEntity<String> updateUserStatus(@PathVariable Long userId,@Valid @RequestBody UpdateUserStatusDTO updateUserStatusDTO) {
+        userService.updateUserStatus(userId, updateUserStatusDTO.getStatus());
         return ResponseEntity.ok("User status updated successfully");
     }
     

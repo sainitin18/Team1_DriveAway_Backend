@@ -62,8 +62,12 @@ public class AddressServiceImpl implements AddressService {
         return convertToDTO(savedAddress);
     }
 
-    // Get all addresses for a user
+    // Get address for a user
     public List<AddressDTO> getAddressesByUserId(Long userId) {
+    	Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isEmpty()) {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
         List<Address> addresses = addressRepository.findByUserUserId(userId);
         return addresses.stream().map(this::convertToDTO).collect(Collectors.toList());
     }

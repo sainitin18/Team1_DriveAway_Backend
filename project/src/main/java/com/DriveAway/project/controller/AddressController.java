@@ -18,28 +18,28 @@ public class AddressController {
     @Autowired
     private AddressServiceImpl addressService;
 
-    // ✅ Add a new address
+    // Add a new address
     @PostMapping
     public ResponseEntity<AddressDTO> addAddress(@Valid @RequestBody AddressDTO addressDTO) {
         AddressDTO savedAddress = addressService.addAddress(addressDTO);
         return ResponseEntity.ok(savedAddress);
     }
 
-    // ✅ Get all addresses for a user
+    // Get all addresses for a user
     @GetMapping("/{userId}")
     public ResponseEntity<List<AddressDTO>> getUserAddresses(@PathVariable Long userId) {
         List<AddressDTO> addresses = addressService.getAddressesByUserId(userId);
         return ResponseEntity.ok(addresses);
     }
 
-    // ✅ Delete an address
+    // Delete an address
     @DeleteMapping("/{addressId}")
     public ResponseEntity<String> deleteAddress(@PathVariable Long addressId) {
         addressService.deleteAddress(addressId);
         return ResponseEntity.ok("Address deleted successfully!");
     }
 
-    // ✅ Update an address
+    // Update an address
     @PutMapping("/{addressId}")
     public ResponseEntity<AddressDTO> updateAddress(
             @PathVariable Long addressId, 
