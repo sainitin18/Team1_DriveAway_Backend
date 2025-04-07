@@ -14,19 +14,19 @@ public class CarFeatureController {
     @Autowired
     private CarFeatureServiceImpl carFeatureService;
 
-    // ✅ Add Features
+    // Add Features
     @PostMapping
     public ResponseEntity<CarFeatureDTO> addCarFeatures(@RequestBody CarFeatureDTO carFeatureDTO) {
         return ResponseEntity.ok(carFeatureService.addCarFeatures(carFeatureDTO));
     }
 
-    // ✅ Update Features
+    // Update Features
     @PutMapping("/{carId}")
     public ResponseEntity<CarFeatureDTO> updateCarFeatures(@PathVariable Long carId, @RequestBody CarFeatureDTO carFeatureDTO) {
         return ResponseEntity.ok(carFeatureService.updateCarFeatures(carId, carFeatureDTO));
     }
 
-    // ✅ Get Features
+    // Get Features
     @GetMapping("/{carId}")
     public ResponseEntity<CarFeatureDTO> getCarFeatures(@PathVariable Long carId) {
         return ResponseEntity.ok(carFeatureService.getCarFeatures(carId));

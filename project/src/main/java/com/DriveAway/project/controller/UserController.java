@@ -3,7 +3,9 @@ package com.DriveAway.project.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +41,7 @@ public class UserController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
@@ -61,13 +64,31 @@ public class UserController {
     }
     
     @PostMapping("/login")
+//    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+//        boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
+//
+//        if (isAuthenticated) {
+//            return ResponseEntity.ok("Login successful!");
+//        } else {
+//            return ResponseEntity.status(401).body("Invalid credentials!");
+//        }
+//    }
     public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
         boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
 
         if (isAuthenticated) {
-            return ResponseEntity.ok("Login successful!");
+            return ResponseEntity.ok("Login successful");
         } else {
-            return ResponseEntity.status(401).body("Invalid credentials!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
+    }
+    
+    @GetMapping("/pendingUsers")
+    public ResponseEntity<?> getPendingUsers() {
+        List<UserDTO> pendingUsers = userService.getNewUsers();
+        if (pendingUsers.isEmpty()) {
+            return ResponseEntity.ok("No new users pending approval.");
+        }
+        return ResponseEntity.ok(pendingUsers);
     }
 }
