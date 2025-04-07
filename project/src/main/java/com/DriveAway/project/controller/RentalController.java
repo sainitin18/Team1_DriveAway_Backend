@@ -1,6 +1,7 @@
 package com.DriveAway.project.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.DriveAway.project.dto.RentalDTO;
@@ -100,6 +101,13 @@ public class RentalController {
      * Accept a rental request (Only admin can approve).
      * @param id Rental booking ID
      */
+    
+    @GetMapping("/admin/bookings")
+    public ResponseEntity<List<RentalDTO>> getAllBookingsForAdmin() {
+        return ResponseEntity.ok(rentalService.getAllBookingsForAdmin());
+    }
+
+    
     @PutMapping("/{id}/accept")
     public void acceptBooking(@PathVariable Long id) {
         rentalService.acceptBooking(id);

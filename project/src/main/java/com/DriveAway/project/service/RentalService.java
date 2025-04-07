@@ -44,6 +44,7 @@ public interface RentalService {
     int getRentalCountByCarIdAndStatus(Long carId, String status);
     boolean hasPendingBooking(Long userId, Long carId);
     RentalDTO createBooking(RentalDTO rentalDTO);
+    List<RentalDTO> getAllBookingsForAdmin();
     void acceptBooking(Long id);
     void declineBooking(Long id);
     void completeRental(Long id);

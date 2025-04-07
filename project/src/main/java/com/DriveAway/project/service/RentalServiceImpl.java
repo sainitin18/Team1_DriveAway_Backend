@@ -87,6 +87,15 @@ public class RentalServiceImpl implements RentalService {
         }
         throw new RuntimeException("User or Car not found");
     }
+    
+    @Override
+    public List<RentalDTO> getAllBookingsForAdmin() {
+        return rentalRepository.findAll()
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public void acceptBooking(Long id) {

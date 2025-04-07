@@ -44,4 +44,6 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
     boolean existsByUserIdCarIdAndStatus(@Param("userId") Long userId, 
                                    @Param("carId") Long carId, 
                                    @Param("status") String status);
+    List<Rental> findAll();
+
 }
