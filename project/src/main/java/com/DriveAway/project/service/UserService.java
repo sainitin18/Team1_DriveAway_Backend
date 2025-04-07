@@ -13,4 +13,5 @@ public interface UserService {
     void deleteUser(Long userId);
     void updateUserStatus(Long userId, String newStatus);
     public boolean authenticateUser(String email, String rawPassword);
+	List<UserDTO> getNewUsers();
 }

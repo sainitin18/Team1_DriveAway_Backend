@@ -39,8 +39,8 @@ public class User {
     private String altMobileNumber;
 
     @Column(nullable = false)
-    private String role = "USER";
+    private String role = "ADMIN";
     
     @Column(nullable = false)
-    private String status = "Pending";
+    private String status = "ACCEPTED";
 }

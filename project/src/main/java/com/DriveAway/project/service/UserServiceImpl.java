@@ -1,10 +1,15 @@
 package com.DriveAway.project.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.DriveAway.project.dto.UserDTO;
@@ -89,11 +94,38 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);;
 	}
 	
-	public boolean authenticateUser(String email, String rawPassword) {	    
+//	public boolean authenticateUser(String email, String rawPassword) {	    
+//	    User user = userRepository.findByEmail(email)
+//                .orElseThrow(() -> new UserNotFoundException("User not found"));
+//
+//	    // Compare entered password with the hashed password in DB
+//	    return passwordEncoder.matches(rawPassword, user.getPassword());
+//	}
+	
+	public boolean authenticateUser(String email, String rawPassword) {
 	    User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+	            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-	    // Compare entered password with the hashed password in DB
-	    return passwordEncoder.matches(rawPassword, user.getPassword());
+	    boolean matches = passwordEncoder.matches(rawPassword, user.getPassword());
+	    System.out.println(user.getEmail()+user.getRole());
+	    if (matches) {
+	        org.springframework.security.core.Authentication authentication = new UsernamePasswordAuthenticationToken(
+	                user.getEmail(),
+	                null,
+	                Collections.singleton(new SimpleGrantedAuthority(user.getRole())) // e.g., ROLE_USER
+	        );
+
+	        SecurityContextHolder.getContext().setAuthentication(authentication);
+	    }
+
+	    return matches;
+	}
+	
+	@Override
+	public List<UserDTO> getNewUsers() {
+	    List<User> pendingUsers = userRepository.findByStatus("PENDING");
+	    return pendingUsers.stream()
+	            .map(user -> modelMapper.map(user, UserDTO.class))
+	            .collect(Collectors.toList());
 	}
 }
