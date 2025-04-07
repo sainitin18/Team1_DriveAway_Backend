@@ -41,7 +41,7 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
     
     @Query("SELECT CASE WHEN COUNT(r) > 0 THEN true ELSE false END " +
            "FROM Rental r WHERE r.user.userId = :userId AND r.car.carId = :carId AND r.rentalStatus = :status")
-    boolean existsByUserCarAndStatus(@Param("userId") Long userId, 
+    boolean existsByUserIdCarIdAndStatus(@Param("userId") Long userId, 
                                    @Param("carId") Long carId, 
                                    @Param("status") String status);
 }

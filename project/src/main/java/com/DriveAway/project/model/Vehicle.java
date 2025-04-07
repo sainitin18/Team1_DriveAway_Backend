@@ -1,5 +1,9 @@
 package com.DriveAway.project.model;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -46,4 +50,8 @@ public class Vehicle {
 
     @Column(nullable = false)
     private double securityAmount;
+    
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Image> images;
 }

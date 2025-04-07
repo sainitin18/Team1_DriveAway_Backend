@@ -1,5 +1,7 @@
 package com.DriveAway.project.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.Max;
 
 import jakarta.validation.constraints.Min;
@@ -51,4 +53,6 @@ public class VehicleDTO {
     @NotNull(message = "Security amount is required")
     @Min(value = 0, message = "Security amount must be non-negative")
     private Double securityAmount;
+    
+//    private List<String> imageUrls;
 }

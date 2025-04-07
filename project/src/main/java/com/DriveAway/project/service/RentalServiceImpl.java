@@ -58,14 +58,12 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public int getRentalCountByCarIdAndStatus(Long carId, String status) {
-//        return rentalRepository.countByCarIdAndRentalStatus(carId, status);
-    	return 1;
+        return rentalRepository.countByCarAndStatus(carId, status);
     }
 
     @Override
     public boolean hasPendingBooking(Long userId, Long carId) {
-//        return rentalRepository.existsByUserIdAndCarIdAndRentalStatus(userId, carId, "Pending");
-    	return true;
+       return rentalRepository.existsByUserIdCarIdAndStatus(userId, carId, "Pending");
     }
 
     @Override
