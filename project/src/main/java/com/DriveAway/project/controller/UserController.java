@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.DriveAway.project.dto.UpdateUserStatusDTO;
 import com.DriveAway.project.dto.UserDTO;
+import com.DriveAway.project.dto.UserLoginDTO;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 
@@ -37,7 +39,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
+    public ResponseEntity<List<UserDTO>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -53,14 +55,14 @@ public class UserController {
     }
     
     @PutMapping("updateUserStatus/{userId}")
-    public ResponseEntity<String> updateUserStatus(@PathVariable Long userId,@Valid @RequestBody UserDTO request) {
-        userService.updateUserStatus(userId, request.getStatus());
+    public ResponseEntity<String> updateUserStatus(@PathVariable Long userId,@Valid @RequestBody UpdateUserStatusDTO updateUserStatusDTO) {
+        userService.updateUserStatus(userId, updateUserStatusDTO.getStatus());
         return ResponseEntity.ok("User status updated successfully");
     }
     
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
-        boolean isAuthenticated = userService.authenticateUser(userDTO.getEmail(), userDTO.getPassword());
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+        boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
 
         if (isAuthenticated) {
             return ResponseEntity.ok("Login successful!");

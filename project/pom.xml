@@ -74,17 +74,24 @@
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
-		<!-- <dependency>
+		<dependency>
 		    <groupId>org.modelmapper</groupId>
 		    <artifactId>modelmapper</artifactId>
 		    <version>3.2.2</version>
-		</dependency> -->
+		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/mysql/mysql-connector-java -->
-		<dependency>
+		<!-- <dependency>
 		    <groupId>mysql</groupId>
 		    <artifactId>mysql-connector-java</artifactId>
 		    <version>8.0.33</version>
+		</dependency> -->
+		
+		<!-- Spring Boot app to CockroachDB Cloud using JDBC -->
+		<dependency>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>42.7.1</version>
 		</dependency>
 		
 		<!-- https://mvnrepository.com/artifact/org.webjars/swagger-ui -->

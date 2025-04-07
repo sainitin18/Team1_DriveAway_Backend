@@ -89,7 +89,7 @@ public class UserServiceImplTest {
         List<User> users = Arrays.asList(user);
         when(userRepository.findAll()).thenReturn(users);
 
-        List<User> retrievedUsers = userServiceImpl.getAllUsers();
+        List<UserDTO> retrievedUsers = userServiceImpl.getAllUsers();
 
         assertThat(retrievedUsers).hasSize(1);
     }

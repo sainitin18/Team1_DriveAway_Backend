@@ -7,7 +7,7 @@ import com.DriveAway.project.model.User;
 
 public interface UserService {
     User registerUser(UserDTO userDto);
-    List<User> getAllUsers();
+    List<UserDTO> getAllUsers();
     User getUserById(Long userId);
     User updateUser(Long userId, UserDTO userDto);
     void deleteUser(Long userId);

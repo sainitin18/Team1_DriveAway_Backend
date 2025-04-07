@@ -8,6 +8,7 @@ import lombok.Data;
 
 @Data
 public class UserDTO {
+	private Long userId;
     
     @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
