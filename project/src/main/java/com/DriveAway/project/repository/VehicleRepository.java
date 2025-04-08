@@ -11,6 +11,5 @@ import com.DriveAway.project.model.Vehicle;
 
 @Repository
 public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
-	
 	   Optional<Vehicle> findByNumberPlate(String numberPlate);
 }

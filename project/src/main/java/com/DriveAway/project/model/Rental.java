@@ -15,7 +15,7 @@ public class Rental {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long rentalId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -29,24 +29,21 @@ public class Rental {
     private int rentalPeriod; // Rental duration (e.g., in days or hours)
 
     @Column(nullable = false)
-    private String rentalStatus; // Status (Pending, Confirmed, Completed, Cancelled)
+    private String rentalStatus = "PENDING"; // Status (Pending, Confirmed, Completed, Cancelled)
 
     private LocalDate bookingDate;
     private LocalTime bookingTime;
 
     @Column(nullable = false)
-    private LocalDateTime createdTime; // Auto-assigned at creation
+    private LocalDateTime createdTime;
+    
+    private LocalDateTime expiryTime;
 
-    private LocalDateTime expiryTime; // 15-minute expiry rule
-
-    @Column(nullable = false)
-    private Integer securityAmount; // New field: amount to be paid before booking
-
-    private Integer paymentAmount; // Final rental payment
-
+    private Integer totalPaymentAmount;
+    
     @PrePersist
-    private void prePersist() {
+    protected void onCreate() {
         this.createdTime = LocalDateTime.now();
-        this.expiryTime = this.createdTime.plusMinutes(15);
+        this.expiryTime = this.createdTime.plusDays(this.rentalPeriod);
     }
 }
