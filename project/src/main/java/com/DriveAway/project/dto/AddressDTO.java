@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 
 public class AddressDTO {
 
-    private Long addressId;  // ✅ ID will be returned in responses
+    private Long addressId;  
 
     @NotBlank(message = "Street is required")
     private String street;
@@ -31,7 +31,7 @@ public class AddressDTO {
     @Pattern(regexp = "^[a-zA-Z ]+$", message = "Country should contain only letters and spaces")
     private String country;
 
-    private Long userId; // Foreign key reference to User
+    private Long userId;
     
     
 }

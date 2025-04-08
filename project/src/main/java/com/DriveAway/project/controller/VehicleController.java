@@ -1,5 +1,6 @@
 package com.DriveAway.project.controller;
 
+import com.DriveAway.project.dto.CarFeatureDTO;
 import com.DriveAway.project.dto.VehicleDTO;
 
 import com.DriveAway.project.model.Vehicle;
@@ -24,11 +25,21 @@ public class VehicleController {
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<Vehicle> addVehicle(
             @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
-            @RequestPart(value = "images", required = false) MultipartFile[] images) {
+            @RequestPart(value = "images", required = false) MultipartFile[] images,
+            @RequestPart(value = "features", required = false) CarFeatureDTO featureDTO) {
 
-        Vehicle vehicle = vehicleService.addVehicle(vehicleDTO, images);
+    	System.out.println("Feature DTO in controller: " + featureDTO);
+        Vehicle vehicle = vehicleService.addVehicle(vehicleDTO, images, featureDTO);
         return new ResponseEntity<>(vehicle, HttpStatus.CREATED);
     }
+//    @PostMapping(consumes = { "multipart/form-data" })
+//    public ResponseEntity<Vehicle> addVehicle(
+//            @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
+//            @RequestPart(value = "images", required = false) MultipartFile[] images) {
+//
+//        Vehicle vehicle = vehicleService.addVehicle(vehicleDTO, images);
+//        return new ResponseEntity<>(vehicle, HttpStatus.CREATED);
+//    }
 //    @PostMapping
 //    public ResponseEntity<Vehicle> addVehicle(@Valid @RequestBody VehicleDTO vehicleDTO) {
 //        Vehicle vehicle = vehicleService.addVehicle(vehicleDTO);
@@ -52,11 +63,22 @@ public class VehicleController {
     public ResponseEntity<Vehicle> updateVehicle(
             @PathVariable Long carId,
             @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
-            @RequestPart(value = "images", required = false) MultipartFile[] images) {
+            @RequestPart(value = "images", required = false) MultipartFile[] images,
+            @RequestPart(value = "features", required = false) CarFeatureDTO featureDTO) {
 
-        Vehicle updatedVehicle = vehicleService.updateVehicle(carId, vehicleDTO, images);
+        Vehicle updatedVehicle = vehicleService.updateVehicle(carId, vehicleDTO, images, featureDTO);
         return ResponseEntity.ok(updatedVehicle);
     }
+
+//    @PutMapping(value = "/{carId}", consumes = { "multipart/form-data" })
+//    public ResponseEntity<Vehicle> updateVehicle(
+//            @PathVariable Long carId,
+//            @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
+//            @RequestPart(value = "images", required = false) MultipartFile[] images) {
+//
+//        Vehicle updatedVehicle = vehicleService.updateVehicle(carId, vehicleDTO, images);
+//        return ResponseEntity.ok(updatedVehicle);
+//  }
 //    @PutMapping("/{carId}")
 //    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long carId, @Valid @RequestBody VehicleDTO vehicleDTO) {
 //        return ResponseEntity.ok(vehicleService.updateVehicle(carId, vehicleDTO));
