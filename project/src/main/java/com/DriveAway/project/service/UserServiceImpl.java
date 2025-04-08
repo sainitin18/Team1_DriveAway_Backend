@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.exception.UserAlreadyExistsException;
 import com.DriveAway.project.exception.UserNotFoundException;
+import com.DriveAway.project.model.Address;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.repository.UserRepository;
 
@@ -47,6 +48,11 @@ public class UserServiceImpl implements UserService {
         user.setDrivingLicense(userDTO.getDrivingLicense());
         user.setMobileNumber(userDTO.getMobileNumber());
         user.setAltMobileNumber(userDTO.getAltMobileNumber());
+        if (userDTO.getAddress() != null) {
+            Address address = modelMapper.map(userDTO.getAddress(), Address.class);
+            address.setUser(user);  
+            user.setAddress(address);
+        }
         return userRepository.save(user);
     }
 
@@ -75,6 +81,11 @@ public class UserServiceImpl implements UserService {
         user.setDrivingLicense(userDTO.getDrivingLicense());
         user.setMobileNumber(userDTO.getMobileNumber());
         user.setAltMobileNumber(userDTO.getAltMobileNumber());
+        if (userDTO.getAddress() != null) {
+            Address address = modelMapper.map(userDTO.getAddress(), Address.class);
+            address.setUser(user);               
+            user.setAddress(address);  
+        }
         return userRepository.save(user);
     }
 

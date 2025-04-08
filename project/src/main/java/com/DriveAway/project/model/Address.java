@@ -1,5 +1,7 @@
 package com.DriveAway.project.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,6 +32,7 @@ public class Address {
     private String country;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name = "user_id", nullable = false) 
     private User user;
 }

@@ -34,5 +34,4 @@ public class AddressDTO {
     private Long userId; // Foreign key reference to User
     
     
-    
 }

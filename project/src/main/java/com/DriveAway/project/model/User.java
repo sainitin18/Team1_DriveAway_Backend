@@ -1,11 +1,15 @@
 package com.DriveAway.project.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -39,8 +43,12 @@ public class User {
     private String altMobileNumber;
 
     @Column(nullable = false)
-    private String role = "ADMIN";
+    private String role = "USER";
     
     @Column(nullable = false)
-    private String status = "ACCEPTED";
+    private String status = "PENDING";
+    
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private Address address;
 }

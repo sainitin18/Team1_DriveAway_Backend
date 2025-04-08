@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,6 +22,7 @@ import com.DriveAway.project.dto.UserLoginDTO;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -63,7 +65,7 @@ public class UserController {
         return ResponseEntity.ok("User status updated successfully");
     }
     
-    @PostMapping("/login")
+  //  @PostMapping("/login")
 //    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
 //        boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
 //
@@ -73,15 +75,29 @@ public class UserController {
 //            return ResponseEntity.status(401).body("Invalid credentials!");
 //        }
 //    }
-    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+//    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO) {
+//        boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
+//
+//        if (isAuthenticated) {
+//            return ResponseEntity.ok("Login successful");
+//        } else {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+//        }
+//    }
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
         boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
 
         if (isAuthenticated) {
+            // ✅ Persist authentication in the session
+            request.getSession(true).setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
+
             return ResponseEntity.ok("Login successful");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
+
     
     @GetMapping("/pendingUsers")
     public ResponseEntity<?> getPendingUsers() {

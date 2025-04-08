@@ -46,4 +46,6 @@ public class UserDTO {
     
     @NotBlank(message = "Status is required")
     private String status;
+    
+    private AddressDTO address; 
 }
