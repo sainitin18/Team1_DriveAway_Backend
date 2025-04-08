@@ -54,5 +54,6 @@ public class VehicleDTO {
     @Min(value = 0, message = "Security amount must be non-negative")
     private Double securityAmount;
     
-//    private List<String> imageUrls;
+    private List<String> imageUrls;
+    private CarFeatureDTO carFeature;
 }

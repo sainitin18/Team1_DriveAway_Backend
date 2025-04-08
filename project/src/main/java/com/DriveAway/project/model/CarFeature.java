@@ -1,6 +1,8 @@
 package com.DriveAway.project.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +19,7 @@ public class CarFeature {
 
     @OneToOne
     @JoinColumn(name = "car_id", nullable = false)
+    @JsonBackReference
     private Vehicle vehicle;
 
     private boolean spareTyre;

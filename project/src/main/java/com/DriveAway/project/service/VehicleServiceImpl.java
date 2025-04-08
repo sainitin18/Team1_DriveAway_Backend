@@ -1,17 +1,21 @@
 package com.DriveAway.project.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.DriveAway.project.dto.CarFeatureDTO;
 import com.DriveAway.project.dto.VehicleDTO;
 import com.DriveAway.project.exception.VehicleAlreadyExistsException;
 import com.DriveAway.project.exception.VehicleNotFoundException;
+import com.DriveAway.project.model.CarFeature;
 import com.DriveAway.project.model.Image;
 import com.DriveAway.project.model.Vehicle;
 import com.DriveAway.project.repository.ImageRepository;
@@ -31,59 +35,102 @@ public class VehicleServiceImpl implements VehicleService {
     @Autowired
     private Cloudinary cloudinary;
     
+    @Autowired
+    private ModelMapper modelMapper;
+    
+//    @Override
+//    public Vehicle addVehicle(VehicleDTO vehicleDTO, MultipartFile[] images ) {
+//        // ✅ Check if vehicle with the same number plate already exists
+//        Optional<Vehicle> existingVehicle = vehicleRepository.findByNumberPlate(vehicleDTO.getNumberPlate());
+//        if (existingVehicle.isPresent()) {
+//            throw new VehicleAlreadyExistsException("Vehicle with number plate " + vehicleDTO.getNumberPlate() + " already exists.");
+//        }
+//
+//        Vehicle vehicle = new Vehicle();
+//        vehicle.setModel(vehicleDTO.getModel());
+//        vehicle.setBrand(vehicleDTO.getBrand());
+//        vehicle.setType(vehicleDTO.getType());
+//        vehicle.setYear(vehicleDTO.getYear());
+//        vehicle.setFuelType(vehicleDTO.getFuelType());
+//        vehicle.setTransmission(vehicleDTO.getTransmission());
+//        vehicle.setNumberPlate(vehicleDTO.getNumberPlate());
+//        vehicle.setPrice(vehicleDTO.getPrice());
+//        vehicle.setStatus(vehicleDTO.getStatus());
+//        vehicle.setColor(vehicleDTO.getColor());
+//        vehicle.setSeater(vehicleDTO.getSeater());
+//        vehicle.setSecurityAmount(vehicleDTO.getSecurityAmount());
+//        
+//        if (vehicleDTO.getCarFeature() != null) {
+//            CarFeature carFeature = convertToCarFeatureEntity(vehicleDTO.getCarFeature(), vehicle);
+//            vehicle.setCarFeature(carFeature);
+//        }
+//
+//
+//        vehicle = vehicleRepository.save(vehicle); // Save first to get vehicle ID
+//        if (images != null) {
+//            for (MultipartFile file : images) {
+//                try {
+//                    Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+//                    String imageUrl = uploadResult.get("secure_url").toString();
+//
+//                    Image image = new Image();
+//                    image.setUrl(imageUrl);
+//                    image.setVehicle(vehicle);
+//                    imageRepository.save(image);
+//                } catch (IOException e) {
+//                    throw new RuntimeException("Image upload failed: " + file.getOriginalFilename(), e);
+//                }
+//            }
+//        }
+//
+//        return vehicle;
+//   }
     @Override
-    public Vehicle addVehicle(VehicleDTO vehicleDTO, MultipartFile[] images ) {
-        // ✅ Check if vehicle with the same number plate already exists
+    public Vehicle addVehicle(VehicleDTO vehicleDTO, MultipartFile[] images, CarFeatureDTO featureDTO) {
         Optional<Vehicle> existingVehicle = vehicleRepository.findByNumberPlate(vehicleDTO.getNumberPlate());
         if (existingVehicle.isPresent()) {
             throw new VehicleAlreadyExistsException("Vehicle with number plate " + vehicleDTO.getNumberPlate() + " already exists.");
         }
 
-        Vehicle vehicle = new Vehicle();
-        vehicle.setModel(vehicleDTO.getModel());
-        vehicle.setBrand(vehicleDTO.getBrand());
-        vehicle.setType(vehicleDTO.getType());
-        vehicle.setYear(vehicleDTO.getYear());
-        vehicle.setFuelType(vehicleDTO.getFuelType());
-        vehicle.setTransmission(vehicleDTO.getTransmission());
-        vehicle.setNumberPlate(vehicleDTO.getNumberPlate());
-        vehicle.setPrice(vehicleDTO.getPrice());
-        vehicle.setStatus(vehicleDTO.getStatus());
-        vehicle.setColor(vehicleDTO.getColor());
-        vehicle.setSeater(vehicleDTO.getSeater());
-        vehicle.setSecurityAmount(vehicleDTO.getSecurityAmount());
+        Vehicle vehicle = modelMapper.map(vehicleDTO, Vehicle.class);
+        System.out.println("Feature DTO: " + featureDTO);
+        if (featureDTO != null) {
+            CarFeature carFeature = modelMapper.map(featureDTO, CarFeature.class);
+            carFeature.setVehicle(vehicle);         
+            vehicle.setCarFeature(carFeature);      
+        }
 
-        vehicle = vehicleRepository.save(vehicle); // Save first to get vehicle ID
+        vehicle = vehicleRepository.save(vehicle); 
+
+        // Save images
         if (images != null) {
+        	List<Image> imagesList = new ArrayList<Image>();
             for (MultipartFile file : images) {
                 try {
                     Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
                     String imageUrl = uploadResult.get("secure_url").toString();
-
                     Image image = new Image();
                     image.setUrl(imageUrl);
                     image.setVehicle(vehicle);
+                    imagesList.add(image);
                     imageRepository.save(image);
                 } catch (IOException e) {
                     throw new RuntimeException("Image upload failed: " + file.getOriginalFilename(), e);
                 }
             }
+            vehicle.setImages(imagesList);
         }
-
         return vehicle;
-
-//        if (vehicleDTO.getImageUrls() != null) {
-//            for (String url : vehicleDTO.getImageUrls()) {
-//                Image image = new Image();
-//                image.setUrl(url);
-//                image.setVehicle(vehicle);
-//                imageRepository.save(image);
-//            }
-//        }
-//
-//        return vehicle;
-
     }
+
+    
+    private CarFeature convertToCarFeatureEntity(CarFeatureDTO dto, Vehicle vehicle) {
+        CarFeature feature = modelMapper.map(dto, CarFeature.class);
+        feature.setVehicle(vehicle);
+        return feature;
+    }
+
+
 
     @Override
     public List<Vehicle> getAllVehicles() {
@@ -135,8 +182,63 @@ public class VehicleServiceImpl implements VehicleService {
 //
 //        return existingVehicle;
 //    }
+//    @Override
+//    public Vehicle updateVehicle(Long carId, VehicleDTO vehicleDTO, MultipartFile[] images ) {
+//        Vehicle existingVehicle = vehicleRepository.findById(carId)
+//                .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with ID: " + carId));
+//
+//        Optional<Vehicle> vehicleWithSameNumberPlate = vehicleRepository.findByNumberPlate(vehicleDTO.getNumberPlate());
+//        if (vehicleWithSameNumberPlate.isPresent() && !vehicleWithSameNumberPlate.get().getCarId().equals(carId)) {
+//            throw new VehicleAlreadyExistsException("Another vehicle with number plate " + vehicleDTO.getNumberPlate() + " already exists.");
+//        }
+//
+//        // Update vehicle fields
+//        existingVehicle.setModel(vehicleDTO.getModel());
+//        existingVehicle.setBrand(vehicleDTO.getBrand());
+//        existingVehicle.setType(vehicleDTO.getType());
+//        existingVehicle.setYear(vehicleDTO.getYear());
+//        existingVehicle.setFuelType(vehicleDTO.getFuelType());
+//        existingVehicle.setTransmission(vehicleDTO.getTransmission());
+//        existingVehicle.setNumberPlate(vehicleDTO.getNumberPlate());
+//        existingVehicle.setPrice(vehicleDTO.getPrice());
+//        existingVehicle.setStatus(vehicleDTO.getStatus());
+//        existingVehicle.setColor(vehicleDTO.getColor());
+//        existingVehicle.setSeater(vehicleDTO.getSeater());
+//        existingVehicle.setSecurityAmount(vehicleDTO.getSecurityAmount());
+//
+//        existingVehicle = vehicleRepository.save(existingVehicle);
+//        
+//        if (featureDTO != null) {
+//            CarFeature updatedFeature = modelMapper.map(featureDTO, CarFeature.class);
+//            updatedFeature.setId(existingVehicle.getCarFeature().getId()); 
+//            updatedFeature.setVehicle(existingVehicle);
+//            existingVehicle.setCarFeature(updatedFeature); 
+//        }
+//
+//        // Optional: Remove old images if needed
+//        // imageRepository.deleteByVehicle(existingVehicle);
+//
+//        // Save new images
+//        if (images != null) {
+//            for (MultipartFile file : images) {
+//                try {
+//                    Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+//                    String imageUrl = uploadResult.get("secure_url").toString();
+//
+//                    Image image = new Image();
+//                    image.setUrl(imageUrl);
+//                    image.setVehicle(existingVehicle);
+//                    imageRepository.save(image);
+//                } catch (IOException e) {
+//                    throw new RuntimeException("Image upload failed: " + file.getOriginalFilename(), e);
+//                }
+//            }
+//        }
+//
+//        return existingVehicle;
+//    }
     @Override
-    public Vehicle updateVehicle(Long carId, VehicleDTO vehicleDTO, MultipartFile[] images) {
+    public Vehicle updateVehicle(Long carId, VehicleDTO vehicleDTO, MultipartFile[] images, CarFeatureDTO featureDTO) {
         Vehicle existingVehicle = vehicleRepository.findById(carId)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with ID: " + carId));
 
@@ -145,26 +247,18 @@ public class VehicleServiceImpl implements VehicleService {
             throw new VehicleAlreadyExistsException("Another vehicle with number plate " + vehicleDTO.getNumberPlate() + " already exists.");
         }
 
-        // Update vehicle fields
-        existingVehicle.setModel(vehicleDTO.getModel());
-        existingVehicle.setBrand(vehicleDTO.getBrand());
-        existingVehicle.setType(vehicleDTO.getType());
-        existingVehicle.setYear(vehicleDTO.getYear());
-        existingVehicle.setFuelType(vehicleDTO.getFuelType());
-        existingVehicle.setTransmission(vehicleDTO.getTransmission());
-        existingVehicle.setNumberPlate(vehicleDTO.getNumberPlate());
-        existingVehicle.setPrice(vehicleDTO.getPrice());
-        existingVehicle.setStatus(vehicleDTO.getStatus());
-        existingVehicle.setColor(vehicleDTO.getColor());
-        existingVehicle.setSeater(vehicleDTO.getSeater());
-        existingVehicle.setSecurityAmount(vehicleDTO.getSecurityAmount());
+        // Update vehicle fields using ModelMapper
+        modelMapper.map(vehicleDTO, existingVehicle);
 
-        existingVehicle = vehicleRepository.save(existingVehicle);
+        // Update features if provided
+        if (featureDTO != null) {
+            CarFeature updatedFeatures = modelMapper.map(featureDTO, CarFeature.class);
+            updatedFeatures.setVehicle(existingVehicle);
 
-        // Optional: Remove old images if needed
-        // imageRepository.deleteByVehicle(existingVehicle);
+            existingVehicle.setCarFeature(updatedFeatures); // Optional if bidirectional
+        }
 
-        // Save new images
+        // Save new images if provided
         if (images != null) {
             for (MultipartFile file : images) {
                 try {
@@ -181,7 +275,7 @@ public class VehicleServiceImpl implements VehicleService {
             }
         }
 
-        return existingVehicle;
+        return vehicleRepository.save(existingVehicle);
     }
 
     @Override
