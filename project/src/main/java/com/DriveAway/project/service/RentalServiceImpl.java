@@ -79,8 +79,7 @@ public class RentalServiceImpl implements RentalService {
             rental.setRentalStatus("Pending");
             rental.setBookingDate(rentalDTO.getBookingDate());
             rental.setBookingTime(rentalDTO.getBookingTime());
-            rental.setSecurityAmount(rentalDTO.getSecurityAmount());
-            rental.setPaymentAmount(rentalDTO.getPaymentAmount());
+            rental.setTotalPaymentAmount(rentalDTO.getTotalPaymentAmount());
 
             Rental savedRental = rentalRepository.save(rental);
             return convertToDTO(savedRental);
@@ -135,7 +134,7 @@ public class RentalServiceImpl implements RentalService {
 
     private RentalDTO convertToDTO(Rental rental) {
         RentalDTO dto = new RentalDTO();
-        dto.setId(rental.getId());
+        dto.setRentalId(rental.getRentalId());
         dto.setUserId(rental.getUser().getUserId());
         dto.setCarId(rental.getCar().getCarId());
         dto.setRentalPeriod(rental.getRentalPeriod());
@@ -144,8 +143,7 @@ public class RentalServiceImpl implements RentalService {
         dto.setBookingTime(rental.getBookingTime());
         dto.setCreatedTime(rental.getCreatedTime());
         dto.setExpiryTime(rental.getExpiryTime());
-        dto.setSecurityAmount(rental.getSecurityAmount());
-        dto.setPaymentAmount(rental.getPaymentAmount());
+        dto.setTotalPaymentAmount(rental.getTotalPaymentAmount());
         return dto;
     }
 }

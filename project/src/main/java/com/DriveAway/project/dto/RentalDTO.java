@@ -32,10 +32,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class RentalDTO {
-    private Long id;
+    private Long rentalId;
     private Long userId;
     private Long carId;
     private int rentalPeriod;
@@ -44,6 +42,5 @@ public class RentalDTO {
     private LocalTime bookingTime;
     private LocalDateTime createdTime;
     private LocalDateTime expiryTime;
-    private Integer securityAmount;
-    private Integer paymentAmount;
+    private Integer totalPaymentAmount;
 }
