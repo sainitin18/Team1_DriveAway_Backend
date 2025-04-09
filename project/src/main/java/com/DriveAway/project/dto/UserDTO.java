@@ -44,7 +44,6 @@ public class UserDTO {
     
     private String role;
     
-    @NotBlank(message = "Status is required")
     private String status;
     
     private AddressDTO address; 

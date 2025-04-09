@@ -48,7 +48,7 @@ public class User {
     @Column(nullable = false)
     private String status = "PENDING";
     
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference
     private Address address;
 }

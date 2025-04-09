@@ -12,12 +12,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.DriveAway.project.dto.AddressDTO;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.exception.UserAlreadyExistsException;
 import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.Address;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.repository.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 
 @Service
@@ -74,6 +78,7 @@ public class UserServiceImpl implements UserService {
     public User updateUser(Long userId, UserDTO userDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
+
         user.setEmail(userDTO.getEmail());
         user.setUsername(userDTO.getUsername());
         user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
@@ -81,21 +86,39 @@ public class UserServiceImpl implements UserService {
         user.setDrivingLicense(userDTO.getDrivingLicense());
         user.setMobileNumber(userDTO.getMobileNumber());
         user.setAltMobileNumber(userDTO.getAltMobileNumber());
+
         if (userDTO.getAddress() != null) {
-            Address address = modelMapper.map(userDTO.getAddress(), Address.class);
-            address.setUser(user);               
-            user.setAddress(address);  
+            AddressDTO addressDTO = userDTO.getAddress();
+
+            Address address = user.getAddress(); 
+            if (address == null) {
+                address = new Address(); 
+                address.setUser(user);   
+            }
+
+            address.setStreet(addressDTO.getStreet());
+            address.setCity(addressDTO.getCity());
+            address.setState(addressDTO.getState());
+            address.setPostalCode(addressDTO.getPostalCode());
+            address.setCountry(addressDTO.getCountry());
+            
+            address.setUser(user);
+            user.setAddress(address); // Update the address
         }
+
         return userRepository.save(user);
     }
-
+    
     @Override
+    @Transactional
     public void deleteUser(Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("User not found");
-        }
-        userRepository.deleteById(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        // No need to nullify manually
+        userRepository.delete(user);
     }
+
 
 	@Override
 	public void updateUserStatus(Long userId, String newUserStatus) {
@@ -123,7 +146,7 @@ public class UserServiceImpl implements UserService {
 	        org.springframework.security.core.Authentication authentication = new UsernamePasswordAuthenticationToken(
 	                user.getEmail(),
 	                null,
-	                Collections.singleton(new SimpleGrantedAuthority(user.getRole())) // e.g., ROLE_USER
+	                Collections.singleton(new SimpleGrantedAuthority(user.getRole())) 
 	        );
 
 	        SecurityContextHolder.getContext().setAuthentication(authentication);

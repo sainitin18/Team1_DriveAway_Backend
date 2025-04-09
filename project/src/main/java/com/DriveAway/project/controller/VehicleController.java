@@ -27,8 +27,6 @@ public class VehicleController {
             @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
             @RequestPart(value = "images", required = false) MultipartFile[] images,
             @RequestPart(value = "features", required = false) CarFeatureDTO featureDTO) {
-
-    	System.out.println("Feature DTO in controller: " + featureDTO);
         Vehicle vehicle = vehicleService.addVehicle(vehicleDTO, images, featureDTO);
         return new ResponseEntity<>(vehicle, HttpStatus.CREATED);
     }
@@ -65,7 +63,7 @@ public class VehicleController {
             @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
             @RequestPart(value = "images", required = false) MultipartFile[] images,
             @RequestPart(value = "features", required = false) CarFeatureDTO featureDTO) {
-
+    	System.out.println("Feature DTO in controller: " + featureDTO);
         Vehicle updatedVehicle = vehicleService.updateVehicle(carId, vehicleDTO, images, featureDTO);
         return ResponseEntity.ok(updatedVehicle);
     }
