@@ -55,7 +55,7 @@ public class Vehicle {
     @JsonManagedReference
     private List<Image> images;
     
-    @OneToOne(mappedBy = "vehicle", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true )
     @JsonManagedReference
     private CarFeature carFeature;
 }
