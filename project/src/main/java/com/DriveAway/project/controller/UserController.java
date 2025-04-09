@@ -17,9 +17,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.DriveAway.project.dto.AuthResponseDTO;
+import com.DriveAway.project.dto.ForgotPasswordDTO;
 import com.DriveAway.project.dto.UpdateUserStatusDTO;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.dto.UserLoginDTO;
+import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 
@@ -87,18 +90,23 @@ public class UserController {
 //        }
 //    }
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
-        boolean isAuthenticated = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
+    public ResponseEntity<?> login(@RequestBody UserLoginDTO userLoginDTO, HttpServletRequest request) {
+        try {
+            AuthResponseDTO authResponse = userService.authenticateUser(userLoginDTO.getEmail(), userLoginDTO.getPassword());
 
-        if (isAuthenticated) {
-            // ✅ Persist authentication in the session
+            // Persist authentication in the session
             request.getSession(true).setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
-            return ResponseEntity.ok("Login successful");
-        } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+            return ResponseEntity.ok(authResponse);
+        } catch (IllegalStateException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Something went wrong");
         }
     }
+
 
     
     @GetMapping("/pendingUsers")
@@ -108,5 +116,11 @@ public class UserController {
             return ResponseEntity.ok("No new users pending approval.");
         }
         return ResponseEntity.ok(pendingUsers);
+    }
+    
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+        userService.resetPassword(forgotPasswordDTO);
+        return ResponseEntity.ok("Password reset successful.");
     }
 }

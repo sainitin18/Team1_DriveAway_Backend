@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.DriveAway.project.dto.AddressDTO;
+import com.DriveAway.project.dto.AuthResponseDTO;
+import com.DriveAway.project.dto.ForgotPasswordDTO;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.exception.UserAlreadyExistsException;
 import com.DriveAway.project.exception.UserNotFoundException;
@@ -136,12 +138,22 @@ public class UserServiceImpl implements UserService {
 //	    return passwordEncoder.matches(rawPassword, user.getPassword());
 //	}
 	
-	public boolean authenticateUser(String email, String rawPassword) {
+	public AuthResponseDTO authenticateUser(String email, String rawPassword) {
 	    User user = userRepository.findByEmail(email)
 	            .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+	    String status = user.getStatus();
+
+	    if ("PENDING".equalsIgnoreCase(status)) {
+	        throw new IllegalStateException("Your account is pending approval.");
+	    }
+
+	    if ("REJECTED".equalsIgnoreCase(status)) {
+	        throw new IllegalStateException("Your account has been rejected. You are not allowed to log in.");
+	    }
+
 	    boolean matches = passwordEncoder.matches(rawPassword, user.getPassword());
-	    System.out.println(user.getEmail()+user.getRole());
+
 	    if (matches) {
 	        org.springframework.security.core.Authentication authentication = new UsernamePasswordAuthenticationToken(
 	                user.getEmail(),
@@ -150,9 +162,11 @@ public class UserServiceImpl implements UserService {
 	        );
 
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
-	    }
 
-	    return matches;
+	        return new AuthResponseDTO(user.getUserId(), user.getUsername()); // Assuming getId() and getName() exist
+	    } else {
+	        throw new IllegalArgumentException("Invalid password");
+	    }
 	}
 	
 	@Override
@@ -161,5 +175,21 @@ public class UserServiceImpl implements UserService {
 	    return pendingUsers.stream()
 	            .map(user -> modelMapper.map(user, UserDTO.class))
 	            .collect(Collectors.toList());
+	}
+	
+	@Override
+	public void resetPassword(ForgotPasswordDTO forgotPasswordDTO) {
+	    User user = userRepository.findByEmail(forgotPasswordDTO.getEmail())
+	            .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+	    // Only allow password reset for users with ACCEPTED status
+	    if (!"ACCEPTED".equalsIgnoreCase(user.getStatus())) {
+	        throw new IllegalStateException("Password reset is allowed only for accepted users.");
+	    }
+
+	    String encryptedPassword = passwordEncoder.encode(forgotPasswordDTO.getNewPassword());
+	    user.setPassword(encryptedPassword);
+
+	    userRepository.save(user);
 	}
 }
