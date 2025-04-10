@@ -84,11 +84,15 @@ public class UserServiceImpl implements UserService {
         dto.setMobileNumber(user.getMobileNumber());
         dto.setAltMobileNumber(user.getAltMobileNumber());
 
-        dto.setStreet(user.getAddress().getStreet());
-        dto.setCity(user.getAddress().getCity());
-        dto.setState(user.getAddress().getState());
-        dto.setPostalCode(user.getAddress().getPostalCode());
-        dto.setCountry(user.getAddress().getCountry());
+        // Setting nested address DTO
+        UserResponseDTO.AddressDTO addressDTO = new UserResponseDTO.AddressDTO();
+        addressDTO.setStreet(user.getAddress().getStreet());
+        addressDTO.setCity(user.getAddress().getCity());
+        addressDTO.setState(user.getAddress().getState());
+        addressDTO.setPostalCode(user.getAddress().getPostalCode());
+        addressDTO.setCountry(user.getAddress().getCountry());
+
+        dto.setAddress(addressDTO);
 
         return dto;
     }
@@ -99,43 +103,48 @@ public class UserServiceImpl implements UserService {
     	User user = userRepository.findByEmail(email)
         		.orElseThrow(() -> new UserNotFoundException("User not found with ID: " + email));
         
-        UserResponseDTO dto = new UserResponseDTO();
-        dto.setEmail(user.getEmail());
-        dto.setUsername(user.getUsername());
-        dto.setAadharNumber(user.getAadharNumber());
-        dto.setDrivingLicense(user.getDrivingLicense());
-        dto.setMobileNumber(user.getMobileNumber());
-        dto.setAltMobileNumber(user.getAltMobileNumber());
+    	 UserResponseDTO dto = new UserResponseDTO();
+         dto.setEmail(user.getEmail());
+         dto.setUsername(user.getUsername());
+         dto.setAadharNumber(user.getAadharNumber());
+         dto.setDrivingLicense(user.getDrivingLicense());
+         dto.setMobileNumber(user.getMobileNumber());
+         dto.setAltMobileNumber(user.getAltMobileNumber());
 
-        dto.setStreet(user.getAddress().getStreet());
-        dto.setCity(user.getAddress().getCity());
-        dto.setState(user.getAddress().getState());
-        dto.setPostalCode(user.getAddress().getPostalCode());
-        dto.setCountry(user.getAddress().getCountry());
+         // Setting nested address DTO
+         UserResponseDTO.AddressDTO addressDTO = new UserResponseDTO.AddressDTO();
+         addressDTO.setStreet(user.getAddress().getStreet());
+         addressDTO.setCity(user.getAddress().getCity());
+         addressDTO.setState(user.getAddress().getState());
+         addressDTO.setPostalCode(user.getAddress().getPostalCode());
+         addressDTO.setCountry(user.getAddress().getCountry());
 
-        return dto;
+         dto.setAddress(addressDTO);
+
+         return dto;
     }
 
     @Override
-    public User updateUser(Long userId, UserDTO userDTO) {
+    public User updateUser(Long userId, UserResponseDTO userResponseDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
-        user.setEmail(userDTO.getEmail());
-        user.setUsername(userDTO.getUsername());
-        user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-        user.setAadharNumber(userDTO.getAadharNumber());
-        user.setDrivingLicense(userDTO.getDrivingLicense());
-        user.setMobileNumber(userDTO.getMobileNumber());
-        user.setAltMobileNumber(userDTO.getAltMobileNumber());
+        // Update basic user fields
+        user.setEmail(userResponseDTO.getEmail());
+        user.setUsername(userResponseDTO.getUsername());
+        user.setAadharNumber(userResponseDTO.getAadharNumber());
+        user.setDrivingLicense(userResponseDTO.getDrivingLicense());
+        user.setMobileNumber(userResponseDTO.getMobileNumber());
+        user.setAltMobileNumber(userResponseDTO.getAltMobileNumber());
 
-        if (userDTO.getAddress() != null) {
-            AddressDTO addressDTO = userDTO.getAddress();
+        // Update address if available in DTO
+        if (userResponseDTO.getAddress() != null) {
+            UserResponseDTO.AddressDTO addressDTO = userResponseDTO.getAddress();
+            Address address = user.getAddress();
 
-            Address address = user.getAddress(); 
             if (address == null) {
-                address = new Address(); 
-                address.setUser(user);   
+                address = new Address();
+                address.setUser(user);
             }
 
             address.setStreet(addressDTO.getStreet());
@@ -143,9 +152,8 @@ public class UserServiceImpl implements UserService {
             address.setState(addressDTO.getState());
             address.setPostalCode(addressDTO.getPostalCode());
             address.setCountry(addressDTO.getCountry());
-            
-            address.setUser(user);
-            user.setAddress(address); // Update the address
+
+            user.setAddress(address);
         }
 
         return userRepository.save(user);

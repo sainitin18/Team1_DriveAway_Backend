@@ -12,7 +12,7 @@ public interface UserService {
 	User registerUser(UserDTO userDto);
     List<UserDTO> getAllUsers();
     UserResponseDTO getUserById(Long userId);
-    User updateUser(Long userId, UserDTO userDto);
+    User updateUser(Long userId, UserResponseDTO userResponseDTO);
     void deleteUser(Long userId);
     void updateUserStatus(Long userId, String newStatus);
     public AuthResponseDTO authenticateUser(String email, String rawPassword);

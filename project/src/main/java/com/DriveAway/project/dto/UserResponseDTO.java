@@ -4,16 +4,20 @@ import lombok.Data;
 
 @Data
 public class UserResponseDTO {
-	 private String email;
-	    private String username;
-	    private String aadharNumber;
-	    private String drivingLicense;
-	    private String mobileNumber;
-	    private String altMobileNumber;
-	    
+    private String email;
+    private String username;
+    private String aadharNumber;
+    private String drivingLicense;
+    private String mobileNumber;
+    private String altMobileNumber;
+    private AddressDTO address; // Nested DTO
+
+    @Data
+    public static class AddressDTO {
         private String street;
         private String city;
         private String state;
         private String postalCode;
         private String country;
+    }
 }

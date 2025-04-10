@@ -31,21 +31,7 @@ public class VehicleController {
         Vehicle vehicle = vehicleService.addVehicle(vehicleDTO, images, featureDTO);
         return new ResponseEntity<>(vehicle, HttpStatus.CREATED);
     }
-//    @PostMapping(consumes = { "multipart/form-data" })
-//    public ResponseEntity<Vehicle> addVehicle(
-//            @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
-//            @RequestPart(value = "images", required = false) MultipartFile[] images) {
-//
-//        Vehicle vehicle = vehicleService.addVehicle(vehicleDTO, images);
-//        return new ResponseEntity<>(vehicle, HttpStatus.CREATED);
-//    }
-//    @PostMapping
-//    public ResponseEntity<Vehicle> addVehicle(@Valid @RequestBody VehicleDTO vehicleDTO) {
-//        Vehicle vehicle = vehicleService.addVehicle(vehicleDTO);
-//        return ResponseEntity.ok(vehicle);
-//    }
 
-    // ✅ Get All Vehicles
     @GetMapping
     public ResponseEntity<List<Vehicle>> getAllVehicles() {
         return ResponseEntity.ok(vehicleService.getAllVehicles());
@@ -69,19 +55,6 @@ public class VehicleController {
         return ResponseEntity.ok(updatedVehicle);
     }
 
-//    @PutMapping(value = "/{carId}", consumes = { "multipart/form-data" })
-//    public ResponseEntity<Vehicle> updateVehicle(
-//            @PathVariable Long carId,
-//            @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
-//            @RequestPart(value = "images", required = false) MultipartFile[] images) {
-//
-//        Vehicle updatedVehicle = vehicleService.updateVehicle(carId, vehicleDTO, images);
-//        return ResponseEntity.ok(updatedVehicle);
-//  }
-//    @PutMapping("/{carId}")
-//    public ResponseEntity<Vehicle> updateVehicle(@PathVariable Long carId, @Valid @RequestBody VehicleDTO vehicleDTO) {
-//        return ResponseEntity.ok(vehicleService.updateVehicle(carId, vehicleDTO));
-//    }
 
     // ✅ Delete Vehicle by ID
     @DeleteMapping("/{carId}")
