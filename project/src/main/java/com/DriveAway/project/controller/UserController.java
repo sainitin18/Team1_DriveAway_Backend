@@ -46,6 +46,12 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
+    
+    @GetMapping("/check-email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+    	return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
+    
 
     @GetMapping
 //    @PreAuthorize("hasRole('ADMIN')")

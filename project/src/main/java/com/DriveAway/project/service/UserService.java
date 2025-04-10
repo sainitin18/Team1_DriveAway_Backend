@@ -17,4 +17,5 @@ public interface UserService {
     public AuthResponseDTO authenticateUser(String email, String rawPassword);
 	List<UserDTO> getNewUsers();
 	public void resetPassword(ForgotPasswordDTO forgotPasswordDTO);
+	User getUserByEmail(String email);
 }
