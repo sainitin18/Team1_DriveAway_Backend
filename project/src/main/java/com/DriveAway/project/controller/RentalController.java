@@ -9,6 +9,7 @@ import com.DriveAway.project.service.RentalService;
 
 import java.util.List;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/RentARide/bookings")
 public class RentalController {

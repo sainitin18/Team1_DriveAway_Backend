@@ -12,6 +12,7 @@ import com.DriveAway.project.service.ImageUploadService;
 import java.io.IOException;
 import java.util.Map;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/image")
 public class ImageUploadController {

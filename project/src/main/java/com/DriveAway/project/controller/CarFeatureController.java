@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import com.DriveAway.project.dto.CarFeatureDTO;
 import com.DriveAway.project.service.CarFeatureServiceImpl;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/car-features")
 public class CarFeatureController {

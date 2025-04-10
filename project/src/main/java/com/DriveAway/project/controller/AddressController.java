@@ -11,6 +11,7 @@ import com.DriveAway.project.service.AddressServiceImpl;
 
 import jakarta.validation.Valid;
 
+@CrossOrigin(origins="*")
 @RestController
 @RequestMapping("/addresses")
 public class AddressController {
