@@ -17,6 +17,7 @@ import com.DriveAway.project.dto.AddressDTO;
 import com.DriveAway.project.dto.AuthResponseDTO;
 import com.DriveAway.project.dto.ForgotPasswordDTO;
 import com.DriveAway.project.dto.UserDTO;
+import com.DriveAway.project.dto.UserResponseDTO;
 import com.DriveAway.project.exception.UserAlreadyExistsException;
 import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.Address;
@@ -71,15 +72,48 @@ public class UserServiceImpl implements UserService {
     }
     
     @Override
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId)
+    public UserResponseDTO getUserById(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userId));
+
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setEmail(user.getEmail());
+        dto.setUsername(user.getUsername());
+        dto.setAadharNumber(user.getAadharNumber());
+        dto.setDrivingLicense(user.getDrivingLicense());
+        dto.setMobileNumber(user.getMobileNumber());
+        dto.setAltMobileNumber(user.getAltMobileNumber());
+
+        dto.setStreet(user.getAddress().getStreet());
+        dto.setCity(user.getAddress().getCity());
+        dto.setState(user.getAddress().getState());
+        dto.setPostalCode(user.getAddress().getPostalCode());
+        dto.setCountry(user.getAddress().getCountry());
+
+        return dto;
     }
+
     
     @Override
-    public User getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+    public UserResponseDTO getUserByEmail(String email) {
+    	User user = userRepository.findByEmail(email)
         		.orElseThrow(() -> new UserNotFoundException("User not found with ID: " + email));
+        
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setEmail(user.getEmail());
+        dto.setUsername(user.getUsername());
+        dto.setAadharNumber(user.getAadharNumber());
+        dto.setDrivingLicense(user.getDrivingLicense());
+        dto.setMobileNumber(user.getMobileNumber());
+        dto.setAltMobileNumber(user.getAltMobileNumber());
+
+        dto.setStreet(user.getAddress().getStreet());
+        dto.setCity(user.getAddress().getCity());
+        dto.setState(user.getAddress().getState());
+        dto.setPostalCode(user.getAddress().getPostalCode());
+        dto.setCountry(user.getAddress().getCountry());
+
+        return dto;
     }
 
     @Override

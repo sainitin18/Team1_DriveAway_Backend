@@ -22,6 +22,7 @@ import com.DriveAway.project.dto.ForgotPasswordDTO;
 import com.DriveAway.project.dto.UpdateUserStatusDTO;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.dto.UserLoginDTO;
+import com.DriveAway.project.dto.UserResponseDTO;
 import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
@@ -43,12 +44,12 @@ public class UserController {
     }
     
     @GetMapping("/{userId}")
-    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<UserResponseDTO> getUserById(@PathVariable Long userId) {
         return ResponseEntity.ok(userService.getUserById(userId));
     }
     
     @GetMapping("/check-email/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+    public ResponseEntity<UserResponseDTO> getUserByEmail(@PathVariable String email) {
     	return ResponseEntity.ok(userService.getUserByEmail(email));
     }
     
