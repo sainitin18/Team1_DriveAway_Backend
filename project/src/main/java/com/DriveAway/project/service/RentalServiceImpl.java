@@ -27,43 +27,12 @@ public class RentalServiceImpl implements RentalService {
     private VehicleRepository vehicleRepository;
 
     @Override
-    public List<RentalDTO> getUserBookingsByStatus(Long userId, String status) {
-        return rentalRepository.findByUserAndStatus(userId, status)
-                .stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RentalDTO> getNewBookingsForAdmin() {
-        return rentalRepository.findByRentalStatus("Pending")
-                .stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RentalDTO> getApprovedBookingsForAdmin() {
-        return rentalRepository.findByRentalStatus("Approved")
-                .stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RentalDTO> getOngoingRentalsForAdmin() {
-        return rentalRepository.findByRentalStatus("Ongoing")
-                .stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RentalDTO> getCompletedRentalsForAdmin() {
-        return rentalRepository.findByRentalStatus("Completed")
-                .stream().map(this::convertToDTO).collect(Collectors.toList());
-    }
-
-    @Override
-    public int getRentalCountByCarIdAndStatus(Long carId, String status) {
-        return rentalRepository.countByCarAndStatus(carId, status);
-    }
-
-    @Override
-    public boolean hasPendingBooking(Long userId, Long carId) {
-       return rentalRepository.existsByUserIdCarIdAndStatus(userId, carId, "Pending");
+    public List<RentalDTO> getRentalsByStatus(String status) {
+    	System.out.println("From get rental service: "+status);
+        return rentalRepository.findByRentalStatus(status)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -72,9 +41,16 @@ public class RentalServiceImpl implements RentalService {
         Optional<Vehicle> carOpt = vehicleRepository.findById(rentalDTO.getCarId());
 
         if (userOpt.isPresent() && carOpt.isPresent()) {
+            User user = userOpt.get();
+            Vehicle car = carOpt.get();
+
+            // ✅ Update vehicle status
+            car.setStatus("NOT AVAILABLE");
+            vehicleRepository.save(car); // Save the updated vehicle status
+
             Rental rental = new Rental();
-            rental.setUser(userOpt.get());
-            rental.setCar(carOpt.get());
+            rental.setUser(user);
+            rental.setCar(car);
             rental.setRentalPeriod(rentalDTO.getRentalPeriod());
             rental.setRentalStatus("Pending");
             rental.setBookingDate(rentalDTO.getBookingDate());
@@ -84,8 +60,10 @@ public class RentalServiceImpl implements RentalService {
             Rental savedRental = rentalRepository.save(rental);
             return convertToDTO(savedRental);
         }
+        
         throw new RuntimeException("User or Car not found");
     }
+
     
     @Override
     public List<RentalDTO> getAllBookingsForAdmin() {
@@ -94,43 +72,74 @@ public class RentalServiceImpl implements RentalService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-
-
+    
     @Override
-    public void acceptBooking(Long id) {
-        rentalRepository.findById(id).ifPresent(rental -> {
-            rental.setRentalStatus("Approved");
-            rentalRepository.save(rental);
-        });
+    public int getRentalCountByCarIdAndStatus(Long carId, String status) {
+        return rentalRepository.countByCarAndStatus(carId, status.toUpperCase());
     }
 
-    @Override
-    public void declineBooking(Long id) {
-        rentalRepository.findById(id).ifPresent(rental -> {
-            rental.setRentalStatus("Declined");
-            rentalRepository.save(rental);
-        });
-    }
 
     @Override
-    public void completeRental(Long id) {
-        rentalRepository.findById(id).ifPresent(rental -> {
-            rental.setRentalStatus("Completed");
-            rentalRepository.save(rental);
-        });
-    }
+    public void updateRentalStatus(Long rentalId, String status) {
+    	System.out.println("From update rental service: "+status);
+        rentalRepository.findById(rentalId).ifPresentOrElse(rental -> {
+            String upperStatus = status.toUpperCase();
+            String currentStatus = rental.getRentalStatus().toUpperCase();
+            Vehicle vehicle = rental.getCar();
 
-    @Override
-    public void cancelBooking(Long id) {
-        rentalRepository.findById(id).ifPresent(rental -> {
-            if ("Pending".equals(rental.getRentalStatus())) {
-                rental.setRentalStatus("Cancelled");
-                rentalRepository.save(rental);
-            } else {
-                throw new RuntimeException("Booking cannot be cancelled as it is already approved or ongoing.");
+            switch (upperStatus) {
+                case "USER CANCELLED":
+                    if (!currentStatus.equals("PENDING")) {
+                        throw new RuntimeException("Booking cannot be cancelled as it is already Approved or Ongoing.");
+                    }
+                    rental.setRentalStatus(upperStatus);
+                    rentalRepository.save(rental);
+
+                    vehicle.setStatus("AVAILABLE");
+                    vehicleRepository.save(vehicle);
+                    break;
+
+                case "DECLINE CAR FOR RIDE":
+                	rental.setRentalStatus(upperStatus);
+                	rentalRepository.save(rental);
+                	break;
+                	
+                case "FINISHED THE RIDE":
+                    rental.setRentalStatus(upperStatus);
+                    rentalRepository.save(rental);
+
+                    vehicle.setStatus("AVAILABLE");
+                    vehicleRepository.save(vehicle);
+                    break;
+
+                case "CAR IS IN RIDE":
+                	rental.setRentalStatus(upperStatus);
+                	rentalRepository.save(rental);
+                	break;
+                	
+                case "ACCEPTED CAR FOR RIDE":
+                	rental.setRentalStatus(upperStatus);
+                	rentalRepository.save(rental);
+                	break;
+                	
+                case "PENDING":
+                    rental.setRentalStatus(upperStatus);
+                    rentalRepository.save(rental);
+
+                    vehicle.setStatus("NOT AVAILABLE");
+                    vehicleRepository.save(vehicle);
+                    break;
+
+                default:
+                    throw new RuntimeException("Unsupported rental status: " + upperStatus);
             }
+
+        }, () -> {
+            throw new RuntimeException("Rental with ID " + rentalId + " not found");
         });
     }
+
+
 
     private RentalDTO convertToDTO(Rental rental) {
         RentalDTO dto = new RentalDTO();

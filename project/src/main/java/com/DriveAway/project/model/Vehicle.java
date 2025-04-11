@@ -40,7 +40,7 @@ public class Vehicle {
     private double price;
 
     @Column(nullable = false)
-    private String status = "available";
+    private String status = "AVAILABLE";
 
     @Column(nullable = false)
     private String color;
