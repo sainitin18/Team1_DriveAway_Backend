@@ -33,13 +33,13 @@
 package com.DriveAway.project.service;
 
 import com.DriveAway.project.dto.RentalDTO;
+import com.DriveAway.project.dto.RentalResponseDTO;
+
 import java.util.List;
 
 public interface RentalService {
-	List<RentalDTO> getRentalsByStatus(String status);
+	List<RentalResponseDTO> getRentalsByStatus(String status);
 	int getRentalCountByCarIdAndStatus(Long carId, String status);
-//    boolean hasPendingBooking(Long userId, Long carId);
     RentalDTO createBooking(RentalDTO rentalDTO);
-    List<RentalDTO> getAllBookingsForAdmin();
     void updateRentalStatus(Long rentalId, String status);
 }

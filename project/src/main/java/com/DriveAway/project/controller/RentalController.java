@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.DriveAway.project.dto.RentalDTO;
+import com.DriveAway.project.dto.RentalResponseDTO;
 import com.DriveAway.project.service.RentalService;
 
 import java.util.List;
@@ -18,20 +19,14 @@ public class RentalController {
     private RentalService rentalService;
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<List<RentalDTO>> getRentalsByStatus(@PathVariable String status) {
-        List<RentalDTO> rentals = rentalService.getRentalsByStatus(status);
+    public ResponseEntity<List<RentalResponseDTO>> getRentalsByStatus(@PathVariable String status) {
+        List<RentalResponseDTO> rentals = rentalService.getRentalsByStatus(status);
         return ResponseEntity.ok(rentals);
     }
     
     @PostMapping
     public RentalDTO createBooking(@RequestBody RentalDTO rentalDTO) {
         return rentalService.createBooking(rentalDTO);
-    }
-
-    
-    @GetMapping("/all")
-    public ResponseEntity<List<RentalDTO>> getAllBookingsForAdmin() {
-        return ResponseEntity.ok(rentalService.getAllBookingsForAdmin());
     }
     
     @GetMapping("/count")

@@ -1,5 +1,6 @@
 package com.DriveAway.project.service;
 import com.DriveAway.project.dto.RentalDTO;
+import com.DriveAway.project.dto.RentalResponseDTO;
 import com.DriveAway.project.model.Rental;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.model.Vehicle;
@@ -27,11 +28,17 @@ public class RentalServiceImpl implements RentalService {
     private VehicleRepository vehicleRepository;
 
     @Override
-    public List<RentalDTO> getRentalsByStatus(String status) {
-    	System.out.println("From get rental service: "+status);
-        return rentalRepository.findByRentalStatus(status)
-                .stream()
-                .map(this::convertToDTO)
+    public List<RentalResponseDTO> getRentalsByStatus(String status) {
+        List<Rental> rentals;
+
+        if ("All".equalsIgnoreCase(status)) {
+            rentals = rentalRepository.findAll();
+        } else {
+            rentals = rentalRepository.findByRentalStatus(status);
+        }
+
+        return rentals.stream()
+                .map(this::convertToRentalResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -63,15 +70,6 @@ public class RentalServiceImpl implements RentalService {
         
         throw new RuntimeException("User or Car not found");
     }
-
-    
-    @Override
-    public List<RentalDTO> getAllBookingsForAdmin() {
-        return rentalRepository.findAll()
-                .stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
     
     @Override
     public int getRentalCountByCarIdAndStatus(Long carId, String status) {
@@ -81,7 +79,7 @@ public class RentalServiceImpl implements RentalService {
 
     @Override
     public void updateRentalStatus(Long rentalId, String status) {
-    	System.out.println("From update rental service: "+status);
+//    	System.out.println("From update rental service: "+status);
         rentalRepository.findById(rentalId).ifPresentOrElse(rental -> {
             String upperStatus = status.toUpperCase();
             String currentStatus = rental.getRentalStatus().toUpperCase();
@@ -150,6 +148,27 @@ public class RentalServiceImpl implements RentalService {
         dto.setRentalStatus(rental.getRentalStatus());
         dto.setBookingDate(rental.getBookingDate());
         dto.setBookingTime(rental.getBookingTime());
+        dto.setCreatedTime(rental.getCreatedTime());
+        dto.setExpiryTime(rental.getExpiryTime());
+        dto.setTotalPaymentAmount(rental.getTotalPaymentAmount());
+        return dto;
+    }
+    
+    private RentalResponseDTO convertToRentalResponseDTO(Rental rental) {
+        RentalResponseDTO dto = new RentalResponseDTO();
+
+        dto.setRentalId(rental.getRentalId());
+        dto.setUserName(rental.getUser().getUsername());
+
+        String brand = rental.getCar().getBrand();
+        String model = rental.getCar().getModel();
+        dto.setCarModel(brand + " " + model);
+
+        dto.setRentalStatus(rental.getRentalStatus());
+        dto.setBookingDate(rental.getBookingDate());
+        dto.setBookingTime(rental.getBookingTime());
+        dto.setNumberOfDays(rental.	getRentalPeriod());
+        dto.setSecurityAmount(rental.getCar().getSecurityAmount());
         dto.setCreatedTime(rental.getCreatedTime());
         dto.setExpiryTime(rental.getExpiryTime());
         dto.setTotalPaymentAmount(rental.getTotalPaymentAmount());
