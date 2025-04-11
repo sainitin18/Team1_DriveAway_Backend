@@ -67,6 +67,7 @@ public class UserServiceImpl implements UserService {
     public List<UserDTO> getAllUsers() {
         List<User> users = userRepository.findAll();
         return users.stream()
+//                    .filter(user -> "ACCEPTED".equalsIgnoreCase(user.getStatus()))
                     .map(user -> modelMapper.map(user, UserDTO.class))
                     .collect(Collectors.toList());
     }
@@ -211,7 +212,7 @@ public class UserServiceImpl implements UserService {
 
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-	        return new AuthResponseDTO(user.getUserId(), user.getUsername()); // Assuming getId() and getName() exist
+	        return new AuthResponseDTO(user.getUserId(), user.getUsername(), user.getRole());
 	    } else {
 	        throw new IllegalArgumentException("Invalid password");
 	    }
