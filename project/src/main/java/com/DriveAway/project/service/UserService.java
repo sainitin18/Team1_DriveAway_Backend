@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.DriveAway.project.dto.AuthResponseDTO;
 import com.DriveAway.project.dto.ForgotPasswordDTO;
+import com.DriveAway.project.dto.UserBookingDTO;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.dto.UserResponseDTO;
 import com.DriveAway.project.model.User;

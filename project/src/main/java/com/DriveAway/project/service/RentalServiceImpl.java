@@ -1,6 +1,7 @@
 package com.DriveAway.project.service;
 import com.DriveAway.project.dto.RentalDTO;
 import com.DriveAway.project.dto.RentalResponseDTO;
+import com.DriveAway.project.dto.UserBookingDTO;
 import com.DriveAway.project.model.Rental;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.model.Vehicle;
@@ -174,6 +175,71 @@ public class RentalServiceImpl implements RentalService {
         dto.setTotalPaymentAmount(rental.getTotalPaymentAmount());
         return dto;
     }
+    
+    @Override
+    public List<UserBookingDTO> getUserBookings(Long userId) {
+        List<Rental> rentals = rentalRepository.findByUserId(userId);
+
+        return rentals.stream()
+            .filter(r -> r.getRentalStatus().equalsIgnoreCase("PENDING") ||
+                         r.getRentalStatus().equalsIgnoreCase("FINISHED THE RIDE") ||
+            			 r.getRentalStatus().equalsIgnoreCase("USER CANCELLED") ||
+						 r.getRentalStatus().equalsIgnoreCase("CAR IS IN RIDE"))
+            .map(this::convertToUserBookingDTO)
+            .collect(Collectors.toList());
+    }
+
+    private UserBookingDTO convertToUserBookingDTO(Rental rental) {
+        UserBookingDTO dto = new UserBookingDTO();
+
+        dto.setRentalId(rental.getRentalId());
+        dto.setUserName(rental.getUser().getUsername());
+
+        String brand = rental.getCar().getBrand();
+        String model = rental.getCar().getModel();
+        dto.setCarModel(brand + " " + model);
+
+        dto.setRentalStatus(rental.getRentalStatus());
+        dto.setBookingDate(rental.getBookingDate());
+        dto.setBookingTime(rental.getBookingTime());
+        dto.setNumberOfDays(rental.getRentalPeriod());
+        dto.setSecurityAmount(rental.getCar().getSecurityAmount());
+        dto.setCreatedTime(rental.getCreatedTime());
+        dto.setExpiryTime(rental.getExpiryTime());
+        dto.setTotalPaymentAmount(rental.getTotalPaymentAmount());
+
+        // ✅ Set image URLs
+        List<String> imageUrls = rental.getCar().getImages()
+                                        .stream()
+                                        .map(image -> image.getUrl())
+                                        .collect(Collectors.toList());
+        dto.setImageUrls(imageUrls);
+
+        return dto;
+    }
+    
+    @Override
+    public boolean cancelBooking(Long rentalId) {
+        Optional<Rental> rentalOptional = rentalRepository.findById(rentalId);
+        
+        if (rentalOptional.isPresent()) {
+            Rental rental = rentalOptional.get();
+            
+            // Optional: Check if it's already cancelled or completed
+            if (rental.getRentalStatus().equalsIgnoreCase("USER CANCELLED") ||
+                rental.getRentalStatus().equalsIgnoreCase("FINISHED THE RIDE")) {
+                return false; // Cancellation not allowed
+            }
+
+            rental.setRentalStatus("USER CANCELLED");
+            rentalRepository.save(rental);
+            return true;
+        }
+
+        return false; 
+    }
+
+
 }
 
 

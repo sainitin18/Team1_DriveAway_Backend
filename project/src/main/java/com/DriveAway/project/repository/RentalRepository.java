@@ -46,4 +46,7 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
                                    @Param("status") String status);
     List<Rental> findAll();
 
+    @Query("SELECT r FROM Rental r WHERE r.user.userId = :userId")
+    List<Rental> findByUserId(@Param("userId") Long userId);
+
 }

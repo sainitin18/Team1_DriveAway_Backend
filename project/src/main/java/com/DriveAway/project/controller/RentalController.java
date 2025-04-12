@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.DriveAway.project.dto.RentalDTO;
 import com.DriveAway.project.dto.RentalResponseDTO;
+import com.DriveAway.project.dto.UserBookingDTO;
 import com.DriveAway.project.service.RentalService;
 
 import java.util.List;
@@ -46,5 +47,20 @@ public class RentalController {
         rentalService.updateRentalStatus(id, status);
         return ResponseEntity.ok("Rental status updated to " + status.toUpperCase());
     }
-
+    
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<UserBookingDTO>> getUserBookings(@PathVariable Long userId) {
+        List<UserBookingDTO> bookings = rentalService.getUserBookings(userId);
+        return ResponseEntity.ok(bookings);
+    }
+    
+    @PutMapping("/cancel/{rentalId}")
+    public ResponseEntity<String> cancelBooking(@PathVariable Long rentalId) {
+        boolean isCancelled = rentalService.cancelBooking(rentalId);
+        if (isCancelled) {
+            return ResponseEntity.ok("Booking cancelled successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Cancellation failed. It may be already cancelled or not allowed.");
+        }
+    }
 }
