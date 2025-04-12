@@ -160,7 +160,8 @@ public class RentalServiceImpl implements RentalService {
 
         dto.setRentalId(rental.getRentalId());
         dto.setUserName(rental.getUser().getUsername());
-
+        dto.setEmail(rental.getUser().getEmail());
+        
         String brand = rental.getCar().getBrand();
         String model = rental.getCar().getModel();
         dto.setCarModel(brand + " " + model);

@@ -10,6 +10,7 @@ import lombok.Data;
 public class RentalResponseDTO {
     private Long rentalId;
     private String userName;
+    private String email;
     private String carModel;
     private String rentalStatus;
     private LocalDate bookingDate;
