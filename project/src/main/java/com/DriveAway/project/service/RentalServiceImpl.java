@@ -73,10 +73,9 @@ public class RentalServiceImpl implements RentalService {
     }
     
     @Override
-    public int getRentalCountByCarIdAndStatus(Long carId, String status) {
-        return rentalRepository.countByCarAndStatus(carId, status.toUpperCase());
+    public int getRentalCountByStatus(String status) {
+        return rentalRepository.countByRentalStatus(status);
     }
-
 
     @Override
     public void updateRentalStatus(Long rentalId, String status) {

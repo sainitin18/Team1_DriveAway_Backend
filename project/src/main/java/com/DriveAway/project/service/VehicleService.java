@@ -16,5 +16,6 @@ public interface VehicleService {
     Vehicle getVehicleById(Long carId);
     Vehicle updateVehicle(Long carId, VehicleDTO vehicleDTO, MultipartFile[] images, CarFeatureDTO featureDTO);
     void deleteVehicle(Long carId);
+    int getAvailableVehicleCount();
 }
 
