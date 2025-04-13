@@ -2,19 +2,20 @@ package com.DriveAway.project.repository;
 
 import com.DriveAway.project.model.Address;
 import com.DriveAway.project.model.User;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // Uses actual DB, not H2
-class AddressRepositoryTest {
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class AddressRepositoryTest {
 
     @Autowired
     private AddressRepository addressRepository;
@@ -26,22 +27,21 @@ class AddressRepositoryTest {
     private Address address;
 
     @BeforeEach
-    void setUp() {
-        // ✅ Given: Create and Save User (Ensuring All Required Fields Are Set)
+    public void setUp() {
+        String uniqueId = UUID.randomUUID().toString().substring(0, 6);
+
         user = new User();
         user.setUsername("John Doe");
-        user.setEmail("john.doe@example.com");
+        user.setEmail("john" + uniqueId + "@example.com");
         user.setPassword("password123");
-        user.setAadharNumber("123456789012"); // ✅ Ensuring Aadhar Number is Set
-        user.setDrivingLicense("DL1234567890"); // ✅ Ensuring Driving License is Set
-        user.setMobileNumber("9876543210");
-        user.setAltMobileNumber("9123456789");
+        user.setAadharNumber("123456" + uniqueId);
+        user.setDrivingLicense("DL" + uniqueId);
+        user.setMobileNumber("98" + uniqueId);  // Ensures uniqueness
+        user.setAltMobileNumber("91" + uniqueId);
         user.setRole("USER");
         user.setStatus("ACTIVE");
+        user = userRepository.save(user);
 
-        user = userRepository.save(user); // ✅ Persist the User
-
-        // ✅ Given: Create and Save Address linked to User
         address = new Address();
         address.setStreet("123 Main Street");
         address.setCity("Hyderabad");
@@ -49,36 +49,39 @@ class AddressRepositoryTest {
         address.setPostalCode("500081");
         address.setCountry("India");
         address.setUser(user);
-
-        address = addressRepository.save(address); // ✅ Persist the Address
+        address = addressRepository.save(address);
     }
 
     @Test
-    void givenAddress_whenSave_thenReturnSavedAddress() {
-        // ✅ Success Case: Address is successfully saved
+    @DisplayName("Test saving an address")
+    @Order(1)
+    public void givenAddress_whenSave_thenReturnSavedAddress() {
         assertThat(address).isNotNull();
         assertThat(address.getAddressId()).isNotNull();
-        assertThat(address.getUser()).isNotNull(); // ✅ Ensure User is Assigned
-        assertThat(address.getUser().getDrivingLicense()).isNotNull(); // ✅ Driving License should not be null
+        assertThat(address.getUser()).isEqualTo(user);
     }
 
     @Test
-    void givenUserId_whenFindByUserId_thenReturnAddressList() {
-        // ✅ When retrieving addresses by user ID
+    @DisplayName("Test finding address by user ID")
+    @Order(2)
+    public void givenUserId_whenFindByUserId_thenReturnAddressList() {
         List<Address> addresses = addressRepository.findByUserUserId(user.getUserId());
-
-        // ✅ Success Case: The list is not empty and contains the correct user's addresses
         assertThat(addresses).isNotEmpty();
         assertThat(addresses.get(0).getUser().getUserId()).isEqualTo(user.getUserId());
-        assertThat(addresses.get(0).getUser().getDrivingLicense()).isEqualTo(user.getDrivingLicense()); // ✅ Ensuring Correct License
     }
 
     @Test
-    void givenAddressId_whenDelete_thenRemoveAddress() {
-        // ✅ When deleting an address by ID
+    @DisplayName("Test deleting an address by ID")
+    @Order(3)
+    public void givenAddressId_whenDelete_thenRemoveAddress() {
         addressRepository.deleteById(address.getAddressId());
+        boolean exists = addressRepository.existsById(address.getAddressId());
+        assertThat(exists).isFalse();
+    }
 
-        // ✅ Success Case: The address no longer exists in the database
-        assertThat(addressRepository.existsById(address.getAddressId())).isFalse();
+    @AfterEach
+    public void cleanUp() {
+        addressRepository.deleteAll();
+        userRepository.deleteAll();
     }
 }

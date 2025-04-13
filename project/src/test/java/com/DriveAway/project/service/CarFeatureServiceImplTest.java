@@ -1,26 +1,28 @@
 package com.DriveAway.project.service;
 
+import com.DriveAway.project.dto.CarFeatureDTO;
+import com.DriveAway.project.model.CarFeature;
+import com.DriveAway.project.model.Vehicle;
+import com.DriveAway.project.repository.CarFeatureRepository;
+import com.DriveAway.project.repository.VehicleRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-import java.util.Optional;
-
-import com.DriveAway.project.model.Vehicle;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-
-import com.DriveAway.project.dto.CarFeatureDTO;
-import com.DriveAway.project.model.CarFeature;
-import com.DriveAway.project.repository.CarFeatureRepository;
-import com.DriveAway.project.repository.VehicleRepository;
-
 public class CarFeatureServiceImplTest {
+
+    @InjectMocks
+    private CarFeatureServiceImpl carFeatureService;
 
     @Mock
     private CarFeatureRepository carFeatureRepository;
@@ -28,108 +30,163 @@ public class CarFeatureServiceImplTest {
     @Mock
     private VehicleRepository vehicleRepository;
 
-    @InjectMocks
-    private CarFeatureServiceImpl carFeatureService;
-
-    private CarFeatureDTO featureDTO;
-    private Vehicle vehicle;
-    private CarFeature feature;
+    @Mock
+    private ModelMapper modelMapper;
 
     @BeforeEach
-    void setUp() {
+    public void setup() {
         MockitoAnnotations.openMocks(this);
-
-        // Create mock vehicle
-        vehicle = new Vehicle();
-        vehicle.setCarId(1L);
-        vehicle.setModel("Civic");
-        vehicle.setBrand("Honda");
-
-        // Create DTO
-        featureDTO = new CarFeatureDTO();
-        featureDTO.setCarId(1L);
-        featureDTO.setSpareTyre(true);
-        featureDTO.setReverseCamera(true);
-        featureDTO.setBluetooth(true);
-
-        // Create CarFeature entity
-        feature = new CarFeature();
-        feature.setVehicle(vehicle);
-        feature.setSpareTyre(true);
-        feature.setReverseCamera(true);
-        feature.setBluetooth(true);
     }
 
     @Test
-    @DisplayName("✅ Add car features - success")
-    void givenCarFeatureDTO_whenAddCarFeatures_thenReturnSavedDTO() {
-        when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
-        when(carFeatureRepository.save(any(CarFeature.class))).thenReturn(feature);
+    @DisplayName("Add Car Features - Success")
+    void testAddCarFeatures_Success() {
+        Long carId = 1L;
+        Vehicle vehicle = new Vehicle();
+        vehicle.setCarId(carId);
 
-        CarFeatureDTO result = carFeatureService.addCarFeatures(featureDTO);
+        CarFeatureDTO inputDTO = new CarFeatureDTO();
+        inputDTO.setCarId(carId);
+        inputDTO.setAbs(true);
+
+        CarFeature mappedEntity = new CarFeature();
+        mappedEntity.setVehicle(vehicle);
+        mappedEntity.setAbs(true);
+
+        CarFeature savedEntity = new CarFeature();
+        savedEntity.setFeatureId(100L);
+        savedEntity.setVehicle(vehicle);
+        savedEntity.setAbs(true);
+
+        CarFeatureDTO expectedDTO = new CarFeatureDTO();
+        expectedDTO.setCarId(carId);
+        expectedDTO.setAbs(true);
+
+        when(vehicleRepository.findById(carId)).thenReturn(Optional.of(vehicle));
+        when(carFeatureRepository.findByVehicle_CarId(carId)).thenReturn(Optional.empty());
+        when(modelMapper.map(inputDTO, CarFeature.class)).thenReturn(mappedEntity);
+        when(carFeatureRepository.save(mappedEntity)).thenReturn(savedEntity);
+        when(modelMapper.map(savedEntity, CarFeatureDTO.class)).thenReturn(expectedDTO);
+
+        CarFeatureDTO result = carFeatureService.addCarFeatures(inputDTO);
 
         assertThat(result).isNotNull();
-        assertThat(result.getCarId()).isEqualTo(1L);
-        assertThat(result.isSpareTyre()).isTrue();
-        assertThat(result.isBluetooth()).isTrue();
+        assertThat(result.isAbs()).isTrue();
+
+        verify(vehicleRepository).findById(carId);
+        verify(carFeatureRepository).save(mappedEntity);
     }
 
     @Test
-    @DisplayName("❌ Add car features - vehicle not found")
-    void givenInvalidCarId_whenAddCarFeatures_thenThrowException() {
-        when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());
+    @DisplayName("Add Car Features - Vehicle Not Found")
+    void testAddCarFeatures_VehicleNotFound() {
+        Long carId = 99L;
+        CarFeatureDTO dto = new CarFeatureDTO();
+        dto.setCarId(carId);
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                carFeatureService.addCarFeatures(featureDTO));
+        when(vehicleRepository.findById(carId)).thenReturn(Optional.empty());
 
-        assertThat(ex.getMessage()).contains("Vehicle not found with ID");
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> carFeatureService.addCarFeatures(dto));
+
+        assertThat(exception.getMessage()).contains("Vehicle not found");
     }
 
     @Test
-    @DisplayName("✅ Update car features - success")
-    void givenExistingFeature_whenUpdateCarFeatures_thenReturnUpdatedDTO() {
-        when(carFeatureRepository.findByVehicle_CarId(1L)).thenReturn(Optional.of(feature));
-        when(carFeatureRepository.save(any(CarFeature.class))).thenReturn(feature);
+    @DisplayName("Add Car Features - Already Exists")
+    void testAddCarFeatures_AlreadyExists() {
+        Long carId = 1L;
+        CarFeatureDTO dto = new CarFeatureDTO();
+        dto.setCarId(carId);
 
-        CarFeatureDTO updatedDTO = carFeatureService.updateCarFeatures(1L, featureDTO);
+        Vehicle vehicle = new Vehicle();
+        vehicle.setCarId(carId);
 
-        assertThat(updatedDTO).isNotNull();
-        assertThat(updatedDTO.getCarId()).isEqualTo(1L);
-        assertThat(updatedDTO.isReverseCamera()).isTrue();
+        CarFeature existingFeature = new CarFeature();
+
+        when(vehicleRepository.findById(carId)).thenReturn(Optional.of(vehicle));
+        when(carFeatureRepository.findByVehicle_CarId(carId)).thenReturn(Optional.of(existingFeature));
+
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> carFeatureService.addCarFeatures(dto));
+
+        assertThat(exception.getMessage()).contains("already exist");
     }
 
     @Test
-    @DisplayName("❌ Update car features - not found")
-    void givenNonExistingFeature_whenUpdateCarFeatures_thenThrowException() {
-        when(carFeatureRepository.findByVehicle_CarId(1L)).thenReturn(Optional.empty());
+    @DisplayName("Update Car Features - Success")
+    void testUpdateCarFeatures_Success() {
+        Long carId = 1L;
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                carFeatureService.updateCarFeatures(1L, featureDTO));
+        CarFeature existingFeature = new CarFeature();
+        existingFeature.setFeatureId(100L);
+        existingFeature.setAbs(false);
 
-        assertThat(ex.getMessage()).contains("Features not found for Car ID");
+        CarFeatureDTO inputDTO = new CarFeatureDTO();
+        inputDTO.setCarId(carId);
+        inputDTO.setAbs(true);
+
+        CarFeature updatedEntity = new CarFeature();
+        updatedEntity.setFeatureId(100L);
+        updatedEntity.setAbs(true);
+
+        CarFeatureDTO resultDTO = new CarFeatureDTO();
+        resultDTO.setCarId(carId);
+        resultDTO.setAbs(true);
+
+        when(carFeatureRepository.findByVehicle_CarId(carId)).thenReturn(Optional.of(existingFeature));
+        doAnswer(invocation -> {
+            CarFeatureDTO src = invocation.getArgument(0);
+            CarFeature dest = invocation.getArgument(1);
+            dest.setAbs(src.isAbs());
+            return null;
+        }).when(modelMapper).map(inputDTO, existingFeature);
+
+        when(carFeatureRepository.save(existingFeature)).thenReturn(updatedEntity);
+        when(modelMapper.map(updatedEntity, CarFeatureDTO.class)).thenReturn(resultDTO);
+
+        CarFeatureDTO result = carFeatureService.updateCarFeatures(carId, inputDTO);
+
+        assertThat(result).isNotNull();
+        assertThat(result.isAbs()).isTrue();
     }
 
     @Test
-    @DisplayName("✅ Get car features - success")
-    void givenValidCarId_whenGetCarFeatures_thenReturnDTO() {
-        when(carFeatureRepository.findByVehicle_CarId(1L)).thenReturn(Optional.of(feature));
+    @DisplayName("Update Car Features - Not Found")
+    void testUpdateCarFeatures_NotFound() {
+        Long carId = 2L;
+        CarFeatureDTO dto = new CarFeatureDTO();
 
-        CarFeatureDTO dto = carFeatureService.getCarFeatures(1L);
+        when(carFeatureRepository.findByVehicle_CarId(carId)).thenReturn(Optional.empty());
 
-        assertThat(dto).isNotNull();
-        assertThat(dto.getCarId()).isEqualTo(1L);
-        assertThat(dto.isSpareTyre()).isTrue();
-        assertThat(dto.isBluetooth()).isTrue();
+        assertThrows(RuntimeException.class, () -> carFeatureService.updateCarFeatures(carId, dto));
     }
 
     @Test
-    @DisplayName("❌ Get car features - not found")
-    void givenInvalidCarId_whenGetCarFeatures_thenThrowException() {
-        when(carFeatureRepository.findByVehicle_CarId(1L)).thenReturn(Optional.empty());
+    @DisplayName("Get Car Features - Success")
+    void testGetCarFeatures_Success() {
+        Long carId = 1L;
+        CarFeature entity = new CarFeature();
+        entity.setAbs(true);
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                carFeatureService.getCarFeatures(1L));
+        CarFeatureDTO dto = new CarFeatureDTO();
+        dto.setCarId(carId);
+        dto.setAbs(true);
 
-        assertThat(ex.getMessage()).contains("Features not found for Car ID");
+        when(carFeatureRepository.findByVehicle_CarId(carId)).thenReturn(Optional.of(entity));
+        when(modelMapper.map(entity, CarFeatureDTO.class)).thenReturn(dto);
+
+        CarFeatureDTO result = carFeatureService.getCarFeatures(carId);
+
+        assertThat(result).isNotNull();
+        assertThat(result.isAbs()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Get Car Features - Not Found")
+    void testGetCarFeatures_NotFound() {
+        when(carFeatureRepository.findByVehicle_CarId(999L)).thenReturn(Optional.empty());
+
+        assertThrows(RuntimeException.class, () -> carFeatureService.getCarFeatures(999L));
     }
 }

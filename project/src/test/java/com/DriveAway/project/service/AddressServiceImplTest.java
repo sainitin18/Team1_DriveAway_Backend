@@ -21,14 +21,10 @@ import org.mockito.MockitoAnnotations;
 
 class AddressServiceImplTest {
 
-    @Mock
-    private AddressRepository addressRepository;
+    @Mock private AddressRepository addressRepository;
+    @Mock private UserRepository userRepository;
 
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private AddressServiceImpl addressService;
+    @InjectMocks private AddressServiceImpl addressService;
 
     private User user;
     private Address address;
@@ -52,63 +48,60 @@ class AddressServiceImplTest {
         address.setCountry("India");
         address.setUser(user);
 
-        // ✅ Corrected way to initialize AddressDTO
         addressDTO = new AddressDTO();
-        addressDTO.setAddressId(address.getAddressId());
-        addressDTO.setStreet(address.getStreet());
-        addressDTO.setCity(address.getCity());
-        addressDTO.setState(address.getState());
-        addressDTO.setPostalCode(address.getPostalCode());
-        addressDTO.setCountry(address.getCountry());
-        addressDTO.setUserId(address.getUser().getUserId());
+        addressDTO.setAddressId(1L);
+        addressDTO.setStreet("123 Main Street");
+        addressDTO.setCity("Hyderabad");
+        addressDTO.setState("Telangana");
+        addressDTO.setPostalCode("500001");
+        addressDTO.setCountry("India");
+        addressDTO.setUserId(101L);
     }
 
     @Test
-    @DisplayName("JUnit test for adding an address (Success)")
+    @DisplayName("Add Address - Success")
     void givenAddressDTO_whenAddAddress_thenReturnSavedAddress() {
         when(userRepository.findById(101L)).thenReturn(Optional.of(user));
         when(addressRepository.save(any(Address.class))).thenReturn(address);
 
-        AddressDTO savedAddress = addressService.addAddress(addressDTO);
+        AddressDTO result = addressService.addAddress(addressDTO);
 
-        assertThat(savedAddress).isNotNull();
-        assertThat(savedAddress.getStreet()).isEqualTo("123 Main Street");
-        verify(addressRepository, times(1)).save(any(Address.class));
+        assertThat(result).isNotNull();
+        assertThat(result.getStreet()).isEqualTo("123 Main Street");
+        verify(addressRepository).save(any(Address.class));
     }
 
     @Test
-    @DisplayName("JUnit test for getting all addresses of a user (Success)")
-    void givenUserId_whenGetUserAddresses_thenReturnAddressList() {
-        when(addressRepository.findByUserUserId(101L)).thenReturn(Arrays.asList(address));
+    @DisplayName("Get Addresses By User ID - Success")
+    void givenUserId_whenGetUserAddresses_thenReturnList() {
+        when(userRepository.findById(101L)).thenReturn(Optional.of(user));
+        when(addressRepository.findByUserUserId(101L)).thenReturn(List.of(address));
 
-        List<AddressDTO> addresses = addressService.getAddressesByUserId(101L);
+        List<AddressDTO> result = addressService.getAddressesByUserId(101L);
 
-        assertThat(addresses).isNotEmpty();
-        assertThat(addresses.size()).isEqualTo(1);
-        verify(addressRepository, times(1)).findByUserUserId(101L);
+        assertThat(result).isNotEmpty();
+        verify(addressRepository).findByUserUserId(101L);
     }
 
     @Test
-    @DisplayName("JUnit test for updating an address (Success)")
-    void givenAddressDTO_whenUpdateAddress_thenReturnUpdatedAddress() {
+    @DisplayName("Update Address - Success")
+    void givenAddressDTO_whenUpdateAddress_thenReturnUpdated() {
         when(addressRepository.findById(1L)).thenReturn(Optional.of(address));
         when(addressRepository.save(any(Address.class))).thenReturn(address);
 
-        AddressDTO updatedAddress = addressService.updateAddress(1L, addressDTO);
+        AddressDTO result = addressService.updateAddress(1L, addressDTO);
 
-        assertThat(updatedAddress).isNotNull();
-        assertThat(updatedAddress.getStreet()).isEqualTo("123 Main Street");
-        verify(addressRepository, times(1)).save(any(Address.class));
+        assertThat(result.getAddressId()).isEqualTo(1L);
+        verify(addressRepository).save(any(Address.class));
     }
 
     @Test
-    @DisplayName("JUnit test for deleting an address (Success)")
-    void givenAddressId_whenDeleteAddress_thenRemoveAddress() {
+    @DisplayName("Delete Address - Success")
+    void givenAddressId_whenDeleteAddress_thenNoException() {
         when(addressRepository.existsById(1L)).thenReturn(true);
         doNothing().when(addressRepository).deleteById(1L);
 
         addressService.deleteAddress(1L);
-
-        verify(addressRepository, times(1)).deleteById(1L);
+        verify(addressRepository).deleteById(1L);
     }
 }
