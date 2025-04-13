@@ -40,8 +40,8 @@ import java.util.List;
 
 public interface RentalService {
 	List<RentalResponseDTO> getRentalsByStatus(String status);
-	int getRentalCountByCarIdAndStatus(Long carId, String status);
-    RentalDTO createBooking(RentalDTO rentalDTO);
+	public int getRentalCountByStatus(String status);
+	RentalDTO createBooking(RentalDTO rentalDTO);
     void updateRentalStatus(Long rentalId, String status);
     public List<UserBookingDTO> getUserBookings(Long userId);
     boolean cancelBooking(Long rentalId);

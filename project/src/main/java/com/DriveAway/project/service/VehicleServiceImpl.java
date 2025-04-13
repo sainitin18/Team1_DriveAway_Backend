@@ -95,6 +95,11 @@ public class VehicleServiceImpl implements VehicleService {
         return vehicleRepository.findById(carId)
                 .orElseThrow(() -> new VehicleNotFoundException("Vehicle not found with ID: " + carId));
     }
+    
+    @Override
+    public int getAvailableVehicleCount() {
+        return vehicleRepository.countByStatus("AVAILABLE");
+    }
 
 //    @Override
 //    public Vehicle updateVehicle(Long carId, VehicleDTO vehicleDTO) {

@@ -22,7 +22,7 @@ public class VehicleController {
     @Autowired
     private VehicleService vehicleService;
 
-    // ✅ Add Vehicle (Ensuring Validation)
+    // Add Vehicle (Ensuring Validation)
     @PostMapping(consumes = { "multipart/form-data" })
     public ResponseEntity<Vehicle> addVehicle(
             @RequestPart("vehicle") @Valid VehicleDTO vehicleDTO,
@@ -37,13 +37,13 @@ public class VehicleController {
         return ResponseEntity.ok(vehicleService.getAllVehicles());
     }
 
-    // ✅ Get Vehicle by ID
+    // Get Vehicle by ID
     @GetMapping("/{carId}")
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable Long carId) {
         return ResponseEntity.ok(vehicleService.getVehicleById(carId));
     }
 
-    // ✅ Update Vehicle (Ensuring Validation)
+    // Update Vehicle (Ensuring Validation)
     @PutMapping(value = "/{carId}", consumes = { "multipart/form-data" })
     public ResponseEntity<Vehicle> updateVehicle(
             @PathVariable Long carId,
@@ -56,10 +56,16 @@ public class VehicleController {
     }
 
 
-    // ✅ Delete Vehicle by ID
+    // Delete Vehicle by ID
     @DeleteMapping("/{carId}")
     public ResponseEntity<String> deleteVehicle(@PathVariable Long carId) {
         vehicleService.deleteVehicle(carId);
         return ResponseEntity.ok("Vehicle deleted successfully");
+    }
+    
+    @GetMapping("/available/count")
+    public ResponseEntity<Integer> getAvailableVehicleCount() {
+        int count = vehicleService.getAvailableVehicleCount();
+        return ResponseEntity.ok(count);
     }
 }

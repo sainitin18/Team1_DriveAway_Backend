@@ -30,15 +30,11 @@ public class RentalController {
         return rentalService.createBooking(rentalDTO);
     }
     
-    @GetMapping("/count")
-    public ResponseEntity<Integer> getRentalCountByCarAndStatus(
-            @RequestParam Long carId,
-            @RequestParam String status
-    ) {
-        int count = rentalService.getRentalCountByCarIdAndStatus(carId, status);
+    @GetMapping("/count/{status}")
+    public ResponseEntity<Integer> getRentalCountByStatus(@PathVariable String status) {
+        int count = rentalService.getRentalCountByStatus(status);
         return ResponseEntity.ok(count);
     }
-
     
     @PutMapping("/updateStatus/{id}/{status}")
     public ResponseEntity<String> updateRentalStatus(
