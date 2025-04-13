@@ -45,7 +45,7 @@ public class RentalRepositoryTest {
         user.setRole("USER");
         user.setStatus("APPROVED");
         entityManager.persist(user);
-
+        // All
         // Create and persist the Vehicle
         vehicle = new Vehicle();
         vehicle.setBrand("Toyota");
