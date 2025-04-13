@@ -1,5 +1,7 @@
 package com.DriveAway.project.dto;
 
+
+
 import lombok.Data;
 
 @Data
@@ -11,7 +13,7 @@ public class UserResponseDTO {
     private String mobileNumber;
     private String altMobileNumber;
     private AddressDTO address; // Nested DTO
-
+    
     @Data
     public static class AddressDTO {
         private String street;
@@ -20,4 +22,6 @@ public class UserResponseDTO {
         private String postalCode;
         private String country;
     }
+
+    
 }

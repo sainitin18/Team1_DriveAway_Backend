@@ -1,139 +1,220 @@
 package com.DriveAway.project.controller;
 
-
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import com.DriveAway.project.dto.UserDTO;
+import com.DriveAway.project.dto.*;
+import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-class UserControllerTest {
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
 
-//    private MockMvc mockMvc;
-//    
-//    @Mock
-//    private UserService userService;
-//    
-//    @InjectMocks
-//    private UserController userController;
-//    
-//    private ObjectMapper objectMapper = new ObjectMapper();
-//    
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//        mockMvc = MockMvcBuilders.standaloneSetup(userController).build();
-//    }
-//    
-//    @Test
-//    void testRegisterUser() throws Exception {
-//        UserDTO userDTO = new UserDTO();
-//        userDTO.setEmail("test@example.com");
-//        userDTO.setUsername("TestUser");
-//        userDTO.setPassword("Password@123");
-//        userDTO.setAadharNumber("234567890123");
-//        userDTO.setDrivingLicense("DL1234567890123");
-//        userDTO.setMobileNumber("9876543210");
-//        userDTO.setStatus("Active");
-//        
-//        User user = new User();
-//        user.setUserId(1L);
-//        user.setEmail(userDTO.getEmail());
-//        
-//        when(userService.registerUser(any(UserDTO.class))).thenReturn(user);
-//        
-//        mockMvc.perform(post("/users")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(userDTO)))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.email").value(user.getEmail()));
-//    }
-//    
-//    @Test
-//    void testGetUserById() throws Exception {
-//        User user = new User();
-//        user.setUserId(1L);
-//        user.setEmail("test@example.com");
-//        
-//        when(userService.getUserById(1L)).thenReturn(user);
-//        
-//        mockMvc.perform(get("/users/1"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.email").value(user.getEmail()));
-//    }
-//    
-//    @Test
-//    void testGetAllUsers() throws Exception {
-//        User user1 = new User();
-//        user1.setUserId(1L);
-//        user1.setEmail("user1@example.com");
-//        
-//        User user2 = new User();
-//        user2.setUserId(2L);
-//        user2.setEmail("user2@example.com");
-//        
-////        List<UserDTO> users = Arrays.asList(user1, user2);
-//        when(userService.getAllUsers()).thenReturn(users);
-//        
-//        mockMvc.perform(get("/users"))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$[0].email").value(user1.getEmail()))
-//                .andExpect(jsonPath("$[1].email").value(user2.getEmail()));
-//    }
-//    
-//    @Test
-//    void testUpdateUser() throws Exception {
-//        UserDTO userDTO = new UserDTO();
-//        userDTO.setEmail("updated@example.com");
-//        
-//        User updatedUser = new User();
-//        updatedUser.setUserId(1L);
-//        updatedUser.setEmail(userDTO.getEmail());
-//        
-//        when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(updatedUser);
-//        
-//        mockMvc.perform(put("/users/1")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(userDTO)))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.email").value(updatedUser.getEmail()));
-//    }
-//    
-//    @Test
-//    void testDeleteUser() throws Exception {
-//        doNothing().when(userService).deleteUser(1L);
-//        
-//        mockMvc.perform(delete("/users/1"))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string("User deleted successfully"));
-//    }
-//    
-//    @Test
-//    void testUpdateUserStatus() throws Exception {
-//        UserDTO userDTO = new UserDTO();
-//        userDTO.setStatus("Active");
-//        
-//        doNothing().when(userService).updateUserStatus(1L, "Active");
-//        
-//        mockMvc.perform(put("/users/updateUserStatus/1")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(userDTO)))
-//                .andExpect(status().isOk())
-//                .andExpect(content().string("User status updated successfully"));
-//    }
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@AutoConfigureMockMvc(addFilters = false)
+@WebMvcTest(UserController.class)
+public class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    private UserDTO getSampleUserDTO() {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setEmail("john@example.com");
+        userDTO.setUsername("John");
+        userDTO.setPassword("Password@123");
+        userDTO.setAadharNumber("234567891234");
+        userDTO.setDrivingLicense("DL1234567890123");
+        userDTO.setMobileNumber("9876543210");
+        userDTO.setAltMobileNumber("9123456780");
+        userDTO.setRole("USER");
+        userDTO.setStatus("PENDING");
+
+        // Create a matching AddressDTO (from UserDTO)
+        AddressDTO address = new AddressDTO();
+        address.setStreet("123 Street");
+        address.setCity("City");
+        address.setState("State");
+        address.setPostalCode("123456");
+        address.setCountry("India");
+
+        userDTO.setAddress(address);
+        return userDTO;
+    }
+
+    private UserResponseDTO getSampleUserResponseDTO() {
+        UserResponseDTO dto = new UserResponseDTO();
+        dto.setEmail("john@example.com");
+        dto.setUsername("John");
+        dto.setAadharNumber("234567891234");
+        dto.setDrivingLicense("DL1234567890123");
+        dto.setMobileNumber("9876543210");
+        dto.setAltMobileNumber("9123456780");
+
+        // Create the nested static class instance from UserResponseDTO
+        UserResponseDTO.AddressDTO nestedAddress = new UserResponseDTO.AddressDTO();
+        nestedAddress.setStreet("123 Street");
+        nestedAddress.setCity("City");
+        nestedAddress.setState("State");
+        nestedAddress.setPostalCode("123456");
+        nestedAddress.setCountry("India");
+
+        dto.setAddress(nestedAddress);
+        return dto;
+    }
+
+    @Test
+    void testRegisterUser() throws Exception {
+        UserDTO userDTO = getSampleUserDTO();
+        User savedUser = new User();
+        savedUser.setUserId(1L);
+        savedUser.setEmail(userDTO.getEmail());
+        savedUser.setUsername(userDTO.getUsername());
+
+        when(userService.registerUser(any(UserDTO.class))).thenReturn(savedUser);
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(userDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("john@example.com"));
+    }
+
+    @Test
+    void testGetUserById() throws Exception {
+        UserResponseDTO responseDTO = getSampleUserResponseDTO();
+        when(userService.getUserById(1L)).thenReturn(responseDTO);
+
+        mockMvc.perform(get("/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("John"));
+    }
+
+    @Test
+    void testGetAllUsers() throws Exception {
+        UserDTO userDTO = getSampleUserDTO();
+        when(userService.getAllUsers()).thenReturn(List.of(userDTO));
+
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].email").value("john@example.com"));
+    }
+
+    @Test
+    void testUpdateUser() throws Exception {
+        UserResponseDTO requestDTO = getSampleUserResponseDTO();
+        User updatedUser = new User();
+        updatedUser.setUserId(1L);
+        updatedUser.setUsername("John");
+
+        when(userService.updateUser(eq(1L), any(UserResponseDTO.class))).thenReturn(updatedUser);
+
+        mockMvc.perform(put("/users/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.username").value("John"));
+    }
+
+    @Test
+    void testDeleteUser() throws Exception {
+        doNothing().when(userService).deleteUser(1L);
+
+        mockMvc.perform(delete("/users/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("User deleted successfully"));
+    }
+
+    @Test
+    void testLoginSuccess() throws Exception {
+        UserLoginDTO loginDTO = new UserLoginDTO();
+        loginDTO.setEmail("john@example.com");
+        loginDTO.setPassword("Password@123");
+
+        AuthResponseDTO authResponse = new AuthResponseDTO(1L, "John", "USER");
+
+        when(userService.authenticateUser(anyString(), anyString())).thenReturn(authResponse);
+
+        mockMvc.perform(post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.userId").value(1))
+                .andExpect(jsonPath("$.userName").value("John"))
+                .andExpect(jsonPath("$.role").value("USER"));
+    }
+
+
+    @Test
+    void testLoginUserNotFound() throws Exception {
+        UserLoginDTO loginDTO = new UserLoginDTO();
+        loginDTO.setEmail("notfound@example.com");
+        loginDTO.setPassword("pass");
+
+        when(userService.authenticateUser(anyString(), anyString()))
+                .thenThrow(new UserNotFoundException("User not found"));
+
+        mockMvc.perform(post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(loginDTO)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User not found"));
+    }
+
+    @Test
+    void testGetPendingUsers() throws Exception {
+        UserDTO userDTO = getSampleUserDTO();
+        when(userService.getNewUsers()).thenReturn(List.of(userDTO));
+
+        mockMvc.perform(get("/users/pendingUsers"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].email").value("john@example.com"));
+    }
+
+    @Test
+    void testUpdateUserStatus() throws Exception {
+        UpdateUserStatusDTO statusDTO = new UpdateUserStatusDTO();
+        statusDTO.setStatus("ACCEPTED");
+
+        doNothing().when(userService).updateUserStatus(eq(1L), eq("ACCEPTED"));
+
+        mockMvc.perform(put("/users/updateUserStatus/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(statusDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("User status updated successfully"));
+    }
+
+    @Test
+    void testForgotPassword() throws Exception {
+        ForgotPasswordDTO forgotPasswordDTO = new ForgotPasswordDTO();
+        forgotPasswordDTO.setEmail("john@example.com");
+        forgotPasswordDTO.setNewPassword("NewPass@123");
+
+        doNothing().when(userService).resetPassword(any(ForgotPasswordDTO.class));
+
+        mockMvc.perform(post("/users/forgot-password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(forgotPasswordDTO)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Password reset successful."));
+    }
 }
