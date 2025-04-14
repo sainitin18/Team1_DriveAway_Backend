@@ -238,6 +238,24 @@ public class RentalServiceImpl implements RentalService {
 
         return false; 
     }
+    @Override
+    public void deleteRental(Long rentalId) {
+        Optional<Rental> rentalOptional = rentalRepository.findById(rentalId);
+
+        if (rentalOptional.isPresent()) {
+            Rental rental = rentalOptional.get();
+
+            // Make the associated vehicle available again, if needed
+            Vehicle vehicle = rental.getCar();
+            vehicle.setStatus("AVAILABLE");
+            vehicleRepository.save(vehicle);
+
+            // Finally, delete the rental
+            rentalRepository.deleteById(rentalId);
+        } else {
+            throw new RuntimeException("Rental with ID " + rentalId + " not found");
+        }
+    }
 
 
 }
