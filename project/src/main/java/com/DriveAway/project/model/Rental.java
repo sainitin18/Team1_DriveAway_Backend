@@ -7,6 +7,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "rentals")
 @Data
@@ -23,6 +25,7 @@ public class Rental {
 
     @ManyToOne
     @JoinColumn(name = "car_id", nullable = false, referencedColumnName = "carId")
+//    @JsonIgnore
     private Vehicle car ; // Represents the rented car
 
     @Column(nullable = false)
