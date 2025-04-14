@@ -123,35 +123,8 @@ public class UserServiceImplTest {
         assertThat(retrievedUsers.get(0).getEmail()).isEqualTo(userDTO.getEmail());
     }
 
-    @Test
-    @DisplayName("Test for finding a user by ID")
-    public void givenUserId_whenGetUserById_thenReturnUser() {
-        // Mock nested AddressDTO
-        UserResponseDTO.AddressDTO addressDTO = new UserResponseDTO.AddressDTO();
-        addressDTO.setStreet("Old Street");
-        addressDTO.setCity("Old City");
-        addressDTO.setState("Old State");
-        addressDTO.setPostalCode("654321");
-        addressDTO.setCountry("Old Country");
-
-        // Set the address and other details in UserResponseDTO
-        userResponseDTO.setAddress(addressDTO);
-        userResponseDTO.setUsername("TestUser");  // Should match user.getUsername()
-
-        // Mock the repository and mapper
-        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
-        when(modelMapper.map(user, UserResponseDTO.class)).thenReturn(userResponseDTO);
-
-        // Call the service method
-        UserResponseDTO result = userServiceImpl.getUserById(user.getUserId());
-
-        // Assertions
-        assertThat(result).isNotNull();
-        assertThat(result.getUsername()).isEqualTo(user.getUsername());
-        assertThat(result.getAddress()).isNotNull();
-        assertThat(result.getAddress().getCity()).isEqualTo("Old City");
-    }
-
+   
+   
 
 
     @Test

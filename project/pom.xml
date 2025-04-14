@@ -50,6 +50,21 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		
+		<!-- Stripe SDK -->
+<dependency>
+    <groupId>com.stripe</groupId>
+    <artifactId>stripe-java</artifactId>
+    <version>20.136.0</version>
+</dependency>
+
+<!-- Mockito Inline for static mocking -->
+<dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-inline</artifactId>
+    <version>5.2.0</version>
+    <scope>test</scope>
+</dependency>
+		
 		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
