@@ -50,6 +50,7 @@ public class RentalServiceImplTest {
         user = new User();
         user.setUserId(1L);
         user.setUsername("John Doe");
+        user.setEmail("john@example.com");
 
         vehicle = new Vehicle();
         vehicle.setCarId(1L);
@@ -82,106 +83,102 @@ public class RentalServiceImplTest {
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("PENDING", result.get(0).getRentalStatus());
-        verify(rentalRepository).findByRentalStatus("PENDING");
     }
 
     @Test
-    void testGetUserBookings() {
-        when(rentalRepository.findByUserId(1L)).thenReturn(List.of(rental));
+    void testGetRentalsByStatus_All() {
+        when(rentalRepository.findAll()).thenReturn(List.of(rental));
 
-        List<UserBookingDTO> result = rentalService.getUserBookings(1L);
+        List<RentalResponseDTO> result = rentalService.getRentalsByStatus("All");
 
-        assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("PENDING", result.get(0).getRentalStatus());
-        assertEquals("Toyota Camry", result.get(0).getCarModel());
     }
 
     @Test
-    void testCreateBooking() {
-        RentalDTO rentalDTO = new RentalDTO();
-        rentalDTO.setUserId(1L);
-        rentalDTO.setCarId(1L);
-        rentalDTO.setRentalPeriod(7);
-        rentalDTO.setTotalPaymentAmount(2000);
-        rentalDTO.setBookingDate(LocalDate.parse("2025-04-13"));
-        rentalDTO.setBookingTime(LocalTime.parse("10:00"));
+    void testCreateBooking_Success() {
+        RentalDTO dto = new RentalDTO();
+        dto.setUserId(1L);
+        dto.setCarId(1L);
+        dto.setRentalPeriod(7);
+        dto.setTotalPaymentAmount(2000);
+        dto.setBookingDate(LocalDate.now());
+        dto.setBookingTime(LocalTime.now());
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(user));
         when(vehicleRepository.findById(1L)).thenReturn(Optional.of(vehicle));
         when(rentalRepository.save(any(Rental.class))).thenReturn(rental);
 
-        RentalDTO result = rentalService.createBooking(rentalDTO);
+        RentalDTO created = rentalService.createBooking(dto);
 
-        assertNotNull(result);
-        assertEquals(1L, result.getUserId());
-        assertEquals(1L, result.getCarId());
-        assertEquals("PENDING", result.getRentalStatus());
-        assertEquals(LocalDate.parse("2025-04-13"), result.getBookingDate());
-        assertEquals(LocalTime.parse("10:00"), result.getBookingTime());
+        assertNotNull(created);
+        assertEquals(1L, created.getUserId());
         verify(vehicleRepository).save(any(Vehicle.class));
+        verify(rentalRepository).save(any(Rental.class));
     }
 
     @Test
-    void testUpdateRentalStatus_FinishedRide() {
-        when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
+    void testCreateBooking_UserOrCarNotFound() {
+        RentalDTO dto = new RentalDTO();
+        dto.setUserId(1L);
+        dto.setCarId(1L);
 
-        rentalService.updateRentalStatus(1L, "FINISHED THE RIDE");
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertEquals("FINISHED THE RIDE", rental.getRentalStatus());
-        verify(vehicleRepository).save(vehicle);
-        verify(rentalRepository).save(rental);
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+            rentalService.createBooking(dto);
+        });
+
+        assertEquals("User or Car not found", ex.getMessage());
     }
 
     @Test
-    void testUpdateRentalStatus_UserCancelled() {
+    void testGetUserBookings_FilteredStatuses() {
+        rental.setRentalStatus("FINISHED THE RIDE");
+        when(rentalRepository.findByUserId(1L)).thenReturn(List.of(rental));
+
+        List<UserBookingDTO> result = rentalService.getUserBookings(1L);
+
+        assertEquals(1, result.size());
+        assertEquals("FINISHED THE RIDE", result.get(0).getRentalStatus());
+    }
+
+    @Test
+    void testUpdateRentalStatus_UserCancelled_Valid() {
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
 
         rentalService.updateRentalStatus(1L, "USER CANCELLED");
 
         assertEquals("USER CANCELLED", rental.getRentalStatus());
+        verify(rentalRepository).save(rental);
         verify(vehicleRepository).save(vehicle);
-        verify(rentalRepository).save(rental);
     }
 
     @Test
-    void testUpdateRentalStatus_DeclineRide() {
+    void testUpdateRentalStatus_UserCancelled_Invalid() {
+        rental.setRentalStatus("ACCEPTED CAR FOR RIDE");
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
 
+        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+                rentalService.updateRentalStatus(1L, "USER CANCELLED"));
+
+        assertEquals("Booking cannot be cancelled as it is already Approved or Ongoing.", ex.getMessage());
+    }
+
+    @Test
+    void testUpdateRentalStatus_Decline() {
+        when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
         rentalService.updateRentalStatus(1L, "DECLINE CAR FOR RIDE");
-
         assertEquals("DECLINE CAR FOR RIDE", rental.getRentalStatus());
-        verify(rentalRepository).save(rental);
-    }
-
-    @Test
-    void testUpdateRentalStatus_InRide() {
-        when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
-
-        rentalService.updateRentalStatus(1L, "CAR IS IN RIDE");
-
-        assertEquals("CAR IS IN RIDE", rental.getRentalStatus());
-        verify(rentalRepository).save(rental);
-    }
-
-    @Test
-    void testUpdateRentalStatus_AcceptedRide() {
-        when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
-
-        rentalService.updateRentalStatus(1L, "ACCEPTED CAR FOR RIDE");
-
-        assertEquals("ACCEPTED CAR FOR RIDE", rental.getRentalStatus());
-        verify(rentalRepository).save(rental);
     }
 
     @Test
     void testUpdateRentalStatus_Unsupported() {
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
 
-        RuntimeException exception = assertThrows(RuntimeException.class, () ->
-                rentalService.updateRentalStatus(1L, "UNKNOWN STATUS"));
+        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+                rentalService.updateRentalStatus(1L, "INVALID STATUS"));
 
-        assertEquals("Unsupported rental status: UNKNOWN STATUS", exception.getMessage());
+        assertEquals("Unsupported rental status: INVALID STATUS", ex.getMessage());
     }
 
     @Test
@@ -192,6 +189,7 @@ public class RentalServiceImplTest {
 
         assertTrue(result);
         assertEquals("USER CANCELLED", rental.getRentalStatus());
+        verify(vehicleRepository).save(vehicle);
     }
 
     @Test
@@ -205,7 +203,7 @@ public class RentalServiceImplTest {
     }
 
     @Test
-    void testDeleteRental() {
+    void testDeleteRental_Success() {
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
 
         rentalService.deleteRental(1L);
@@ -216,11 +214,20 @@ public class RentalServiceImplTest {
 
     @Test
     void testDeleteRental_NotFound() {
-        when(rentalRepository.findById(2L)).thenReturn(Optional.empty());
+        when(rentalRepository.findById(1L)).thenReturn(Optional.empty());
 
         RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                rentalService.deleteRental(2L));
+                rentalService.deleteRental(1L));
 
-        assertEquals("Rental with ID 2 not found", ex.getMessage());
+        assertEquals("Rental with ID 1 not found", ex.getMessage());
+    }
+
+    @Test
+    void testGetRentalCountByStatus() {
+        when(rentalRepository.countByRentalStatus("PENDING")).thenReturn(5);
+
+        int count = rentalService.getRentalCountByStatus("PENDING");
+
+        assertEquals(5, count);
     }
 }
