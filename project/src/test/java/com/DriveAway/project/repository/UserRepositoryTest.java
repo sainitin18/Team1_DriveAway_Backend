@@ -82,7 +82,7 @@ public class UserRepositoryTest {
 
         List<User> users = userRepository.findAll();
         assertThat(users).isNotNull();
-        assertThat(users.size()).isEqualTo(13);
+        assertThat(users.size()).isEqualTo(14);
     }
 
     @Test
