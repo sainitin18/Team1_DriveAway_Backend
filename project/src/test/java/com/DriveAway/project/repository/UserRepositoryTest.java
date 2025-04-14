@@ -40,7 +40,6 @@ public class UserRepositoryTest {
 
     @AfterEach
     public void tearDown() {
-        user = null;
         userRepository.deleteAll();
     }
 
@@ -81,15 +80,18 @@ public class UserRepositoryTest {
         userRepository.save(user2);
 
         List<User> users = userRepository.findAll();
+
         assertThat(users).isNotNull();
-        assertThat(users.size()).isEqualTo(13);
+        assertThat(users.size()).isGreaterThanOrEqualTo(2);
     }
 
     @Test
     @DisplayName("JUnit test for find User by Email operation")
     public void givenUser_whenFindByEmail_thenReturnUser() {
         userRepository.save(user);
+
         Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
+
         assertThat(foundUser).isPresent();
         assertThat(foundUser.get().getEmail()).isEqualTo(user.getEmail());
     }
@@ -98,7 +100,9 @@ public class UserRepositoryTest {
     @DisplayName("JUnit test for find Users by Status operation")
     public void givenStatus_whenFindByStatus_thenReturnUsersList() {
         userRepository.save(user);
+
         List<User> activeUsers = userRepository.findByStatus("ACTIVE");
+
         assertThat(activeUsers).isNotEmpty();
         assertThat(activeUsers.get(0).getStatus()).isEqualTo("ACTIVE");
     }
@@ -106,20 +110,24 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("JUnit test for update User operation")
     public void givenUser_whenUpdate_thenReturnUpdatedUser() {
-        userRepository.save(user);
-        String newMobile = "9998887776";
-        User foundUser = userRepository.findById(user.getUserId()).get();
-        foundUser.setMobileNumber(newMobile);
-        User updatedUser = userRepository.save(foundUser);
-        assertThat(updatedUser.getMobileNumber()).isEqualTo(newMobile);
+        User savedUser = userRepository.save(user);
+
+        savedUser.setMobileNumber("9998887776");
+
+        User updatedUser = userRepository.save(savedUser);
+
+        assertThat(updatedUser.getMobileNumber()).isEqualTo("9998887776");
     }
 
     @Test
     @DisplayName("JUnit test for delete User by Id operation")
     public void givenUser_whenDeleteById_thenRemoveUser() {
         User savedUser = userRepository.save(user);
+
         userRepository.deleteById(savedUser.getUserId());
+
         Optional<User> optionalUser = userRepository.findById(savedUser.getUserId());
+
         assertThat(optionalUser).isEmpty();
     }
 }

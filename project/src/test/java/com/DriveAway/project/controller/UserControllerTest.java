@@ -6,6 +6,7 @@ import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,8 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -47,7 +47,6 @@ public class UserControllerTest {
         userDTO.setRole("USER");
         userDTO.setStatus("PENDING");
 
-        // Create a matching AddressDTO (from UserDTO)
         AddressDTO address = new AddressDTO();
         address.setStreet("123 Street");
         address.setCity("City");
@@ -68,7 +67,6 @@ public class UserControllerTest {
         dto.setMobileNumber("9876543210");
         dto.setAltMobileNumber("9123456780");
 
-        // Create the nested static class instance from UserResponseDTO
         UserResponseDTO.AddressDTO nestedAddress = new UserResponseDTO.AddressDTO();
         nestedAddress.setStreet("123 Street");
         nestedAddress.setCity("City");
@@ -81,6 +79,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Register User - Success")
     void testRegisterUser() throws Exception {
         UserDTO userDTO = getSampleUserDTO();
         User savedUser = new User();
@@ -98,6 +97,18 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Register User - Validation Failure")
+    void testRegisterUser_InvalidInput() throws Exception {
+        UserDTO invalidUser = new UserDTO(); // empty userDTO
+
+        mockMvc.perform(post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidUser)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Get User By ID")
     void testGetUserById() throws Exception {
         UserResponseDTO responseDTO = getSampleUserResponseDTO();
         when(userService.getUserById(1L)).thenReturn(responseDTO);
@@ -108,6 +119,18 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Get User By Email")
+    void testGetUserByEmail() throws Exception {
+        UserResponseDTO responseDTO = getSampleUserResponseDTO();
+        when(userService.getUserByEmail("john@example.com")).thenReturn(responseDTO);
+
+        mockMvc.perform(get("/users/check-email/john@example.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value("john@example.com"));
+    }
+
+    @Test
+    @DisplayName("Get All Users")
     void testGetAllUsers() throws Exception {
         UserDTO userDTO = getSampleUserDTO();
         when(userService.getAllUsers()).thenReturn(List.of(userDTO));
@@ -119,6 +142,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Update User")
     void testUpdateUser() throws Exception {
         UserResponseDTO requestDTO = getSampleUserResponseDTO();
         User updatedUser = new User();
@@ -135,6 +159,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Delete User")
     void testDeleteUser() throws Exception {
         doNothing().when(userService).deleteUser(1L);
 
@@ -144,6 +169,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Login Success")
     void testLoginSuccess() throws Exception {
         UserLoginDTO loginDTO = new UserLoginDTO();
         loginDTO.setEmail("john@example.com");
@@ -162,8 +188,8 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.role").value("USER"));
     }
 
-
     @Test
+    @DisplayName("Login - User Not Found")
     void testLoginUserNotFound() throws Exception {
         UserLoginDTO loginDTO = new UserLoginDTO();
         loginDTO.setEmail("notfound@example.com");
@@ -180,6 +206,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Get Pending Users")
     void testGetPendingUsers() throws Exception {
         UserDTO userDTO = getSampleUserDTO();
         when(userService.getNewUsers()).thenReturn(List.of(userDTO));
@@ -190,6 +217,7 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Update User Status - Success")
     void testUpdateUserStatus() throws Exception {
         UpdateUserStatusDTO statusDTO = new UpdateUserStatusDTO();
         statusDTO.setStatus("ACCEPTED");
@@ -204,6 +232,23 @@ public class UserControllerTest {
     }
 
     @Test
+    @DisplayName("Update User Status - User Not Found")
+    void testUpdateUserStatus_UserNotFound() throws Exception {
+        UpdateUserStatusDTO statusDTO = new UpdateUserStatusDTO();
+        statusDTO.setStatus("REJECTED");
+
+        doThrow(new UserNotFoundException("User not found"))
+                .when(userService).updateUserStatus(eq(99L), eq("REJECTED"));
+
+        mockMvc.perform(put("/users/updateUserStatus/99")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(statusDTO)))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("User not found"));
+    }
+
+    @Test
+    @DisplayName("Forgot Password")
     void testForgotPassword() throws Exception {
         ForgotPasswordDTO forgotPasswordDTO = new ForgotPasswordDTO();
         forgotPasswordDTO.setEmail("john@example.com");

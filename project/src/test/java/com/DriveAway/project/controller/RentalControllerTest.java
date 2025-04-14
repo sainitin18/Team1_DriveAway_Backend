@@ -144,4 +144,17 @@ class RentalControllerTest {
 
         verify(rentalService, times(1)).cancelBooking(1L);
     }
+
+    // ✅ Test: Delete Rental
+    @Test
+    @DisplayName("Delete Rental - Success")
+    void testDeleteRental() throws Exception {
+        doNothing().when(rentalService).deleteRental(1L);
+
+        mockMvc.perform(delete("/RentARide/bookings/delete/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Rental with ID 1 has been deleted successfully."));
+
+        verify(rentalService, times(1)).deleteRental(1L);
+    }
 }
