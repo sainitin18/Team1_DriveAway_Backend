@@ -59,4 +59,10 @@ public class RentalController {
             return ResponseEntity.badRequest().body("Cancellation failed. It may be already cancelled or not allowed.");
         }
     }
+    @DeleteMapping("/delete/{rentalId}")
+    public ResponseEntity<String> deleteRental(@PathVariable Long rentalId) {
+        rentalService.deleteRental(rentalId);
+        return ResponseEntity.ok("Rental with ID " + rentalId + " has been deleted successfully.");
+    }
+
 }

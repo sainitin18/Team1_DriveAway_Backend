@@ -45,4 +45,5 @@ public interface RentalService {
     void updateRentalStatus(Long rentalId, String status);
     public List<UserBookingDTO> getUserBookings(Long userId);
     boolean cancelBooking(Long rentalId);
+    void deleteRental(Long rentalId);
 }
