@@ -15,7 +15,7 @@ public class UserDTO {
     private String email;
 
     @NotBlank(message = "Username is required")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "Username should contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "Username should contain only letters and spaces")
     private String username;
 
     @NotBlank(message = "Password is required")

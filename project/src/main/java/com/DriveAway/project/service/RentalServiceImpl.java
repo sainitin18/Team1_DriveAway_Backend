@@ -185,6 +185,7 @@ public class RentalServiceImpl implements RentalService {
 
         return rentals.stream()
             .filter(r -> r.getRentalStatus().equalsIgnoreCase("PENDING") ||
+            			 r.getRentalStatus().equalsIgnoreCase("ACCEPTED CAR FOR RIDE") ||
                          r.getRentalStatus().equalsIgnoreCase("FINISHED THE RIDE") ||
             			 r.getRentalStatus().equalsIgnoreCase("USER CANCELLED") ||
 						 r.getRentalStatus().equalsIgnoreCase("CAR IS IN RIDE"))

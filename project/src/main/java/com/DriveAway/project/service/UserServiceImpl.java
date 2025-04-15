@@ -212,7 +212,7 @@ public class UserServiceImpl implements UserService {
 
 	        SecurityContextHolder.getContext().setAuthentication(authentication);
 
-	        return new AuthResponseDTO(user.getUserId(), user.getUsername(), user.getRole());
+	        return new AuthResponseDTO(user.getUserId(), user.getUsername(), user.getRole(), user.getEmail());
 	    } else {
 	        throw new IllegalArgumentException("Invalid password");
 	    }
