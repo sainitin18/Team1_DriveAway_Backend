@@ -199,4 +199,15 @@ public class VehicleServiceImpl implements VehicleService {
         }
         vehicleRepository.deleteById(carId);
     }
+    
+    @Override
+    public String getCarStatusById(Long carId) {
+        if (!vehicleRepository.existsById(carId)) {
+            throw new VehicleNotFoundException("Vehicle not found with ID: " + carId);
+        }
+
+        return vehicleRepository.findById(carId)
+                .map(Vehicle::getStatus)
+                .orElseThrow(() -> new VehicleNotFoundException("Unable to retrieve status for vehicle ID: " + carId));
+    }
 }

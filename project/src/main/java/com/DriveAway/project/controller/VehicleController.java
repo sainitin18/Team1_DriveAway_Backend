@@ -2,7 +2,7 @@ package com.DriveAway.project.controller;
 
 import com.DriveAway.project.dto.CarFeatureDTO;
 import com.DriveAway.project.dto.VehicleDTO;
-
+import com.DriveAway.project.exception.VehicleNotFoundException;
 import com.DriveAway.project.model.Vehicle;
 import com.DriveAway.project.service.VehicleService;
 import jakarta.validation.Valid;
@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/vehicles")
@@ -67,5 +68,15 @@ public class VehicleController {
     public ResponseEntity<Integer> getAvailableVehicleCount() {
         int count = vehicleService.getAvailableVehicleCount();
         return ResponseEntity.ok(count);
+    }
+    
+    @GetMapping("/{carId}/status")
+    public ResponseEntity<?> getCarStatus(@PathVariable Long carId) {
+        try {
+            String status = vehicleService.getCarStatusById(carId);
+            return ResponseEntity.ok(Map.of("status", status));
+        } catch (VehicleNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", ex.getMessage()));
+        }
     }
 }
