@@ -5,7 +5,6 @@ import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -175,7 +174,7 @@ public class UserControllerTest {
         loginDTO.setEmail("john@example.com");
         loginDTO.setPassword("Password@123");
 
-        AuthResponseDTO authResponse = new AuthResponseDTO(1L, "John", "USER");
+        AuthResponseDTO authResponse = new AuthResponseDTO(1L, "John", "USER","john@example.com");
 
         when(userService.authenticateUser(anyString(), anyString())).thenReturn(authResponse);
 
@@ -185,7 +184,9 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.userName").value("John"))
-                .andExpect(jsonPath("$.role").value("USER"));
+                .andExpect(jsonPath("$.role").value("USER"))
+        		.andExpect(jsonPath("$.email").value("john@example.com"));
+        
     }
 
     @Test

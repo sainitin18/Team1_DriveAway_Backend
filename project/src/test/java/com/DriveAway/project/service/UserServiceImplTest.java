@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.DriveAway.project.dto.AuthResponseDTO;
 import com.DriveAway.project.dto.UserDTO;
 import com.DriveAway.project.dto.UserResponseDTO;
 import com.DriveAway.project.exception.UserAlreadyExistsException;
@@ -24,6 +25,7 @@ import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.Address;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.repository.UserRepository;
+import com.DriveAway.project.dto.ForgotPasswordDTO;
 
 public class UserServiceImplTest {
 
@@ -42,6 +44,7 @@ public class UserServiceImplTest {
     private User user;
     private UserDTO userDTO;
     private UserResponseDTO userResponseDTO;
+    private ForgotPasswordDTO forgotPasswordDTO;
 
     @BeforeEach
     public void setUp() {
@@ -86,6 +89,10 @@ public class UserServiceImplTest {
         userResponseDTO.setDrivingLicense("AB1234567890123");
         userResponseDTO.setMobileNumber("9876543210");
         userResponseDTO.setAltMobileNumber("8765432109");
+
+        forgotPasswordDTO = new ForgotPasswordDTO();
+        forgotPasswordDTO.setEmail("testuser@example.com");
+        forgotPasswordDTO.setNewPassword("NewPassword123");
     }
 
     @Test
@@ -122,10 +129,6 @@ public class UserServiceImplTest {
         assertThat(retrievedUsers).hasSize(1);
         assertThat(retrievedUsers.get(0).getEmail()).isEqualTo(userDTO.getEmail());
     }
-
-   
-   
-
 
     @Test
     @DisplayName("Test for finding a non-existing user by ID")
@@ -186,5 +189,27 @@ public class UserServiceImplTest {
         when(userRepository.findByEmail(userDTO.getEmail())).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> userServiceImpl.authenticateUser(userDTO.getEmail(), "Test@123"));
+    }
+
+    @Test
+    @DisplayName("Test for resetting password for accepted user")
+    public void givenValidEmail_whenResetPassword_thenPasswordResetSuccessful() {
+        when(userRepository.findByEmail(forgotPasswordDTO.getEmail())).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(forgotPasswordDTO.getNewPassword())).thenReturn("encryptedNewPassword");
+        when(userRepository.save(any(User.class))).thenReturn(user);
+
+        userServiceImpl.resetPassword(forgotPasswordDTO);
+
+        assertThat(user.getPassword()).isEqualTo("encryptedNewPassword");
+        verify(userRepository, times(1)).save(any(User.class));
+    }
+
+    @Test
+    @DisplayName("Test for resetting password for non-accepted user")
+    public void givenNonAcceptedUser_whenResetPassword_thenThrowException() {
+        user.setStatus("PENDING");
+        when(userRepository.findByEmail(forgotPasswordDTO.getEmail())).thenReturn(Optional.of(user));
+
+        assertThrows(IllegalStateException.class, () -> userServiceImpl.resetPassword(forgotPasswordDTO));
     }
 }
