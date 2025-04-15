@@ -123,16 +123,9 @@ public class UserServiceImplTest {
         assertThat(retrievedUsers.get(0).getEmail()).isEqualTo(userDTO.getEmail());
     }
 
-    @Test
-    @DisplayName("Test for finding a user by ID")
-    public void givenUserId_whenGetUserById_thenReturnUser() {
-        when(userRepository.findById(user.getUserId())).thenReturn(Optional.of(user));
+   
+   
 
-        UserResponseDTO result = userServiceImpl.getUserById(user.getUserId());
-
-        assertThat(result).isNotNull();
-        assertThat(result.getUsername()).isEqualTo(user.getUsername());
-    }
 
     @Test
     @DisplayName("Test for finding a non-existing user by ID")

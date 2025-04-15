@@ -100,6 +100,9 @@ public class RentalServiceImpl implements RentalService {
                 case "DECLINE CAR FOR RIDE":
                 	rental.setRentalStatus(upperStatus);
                 	rentalRepository.save(rental);
+                	
+                	vehicle.setStatus("AVAILABLE");
+                    vehicleRepository.save(vehicle);
                 	break;
                 	
                 case "FINISHED THE RIDE":
@@ -216,28 +219,36 @@ public class RentalServiceImpl implements RentalService {
         dto.setImageUrls(imageUrls);
 
         return dto;
-    }
+    }  
     
     @Override
     public boolean cancelBooking(Long rentalId) {
         Optional<Rental> rentalOptional = rentalRepository.findById(rentalId);
-        
+
         if (rentalOptional.isPresent()) {
             Rental rental = rentalOptional.get();
-            
-            // Optional: Check if it's already cancelled or completed
+            Vehicle vehicle = rental.getCar();
+
+            // Optional: Check status before cancel
             if (rental.getRentalStatus().equalsIgnoreCase("USER CANCELLED") ||
                 rental.getRentalStatus().equalsIgnoreCase("FINISHED THE RIDE")) {
-                return false; // Cancellation not allowed
+                return false; // Already cancelled or finished
             }
 
             rental.setRentalStatus("USER CANCELLED");
             rentalRepository.save(rental);
+
+            vehicle.setStatus("AVAILABLE");
+            vehicleRepository.save(vehicle);
+
             return true;
         }
 
-        return false; 
+        return false;
     }
+    
+    
+    
     @Override
     public void deleteRental(Long rentalId) {
         Optional<Rental> rentalOptional = rentalRepository.findById(rentalId);
