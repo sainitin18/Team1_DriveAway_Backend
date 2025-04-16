@@ -33,7 +33,7 @@ pipeline {
    			}
         stage('Maven Build') { 
             steps {
-                bat 'mvn clean install'
+                sh 'mvn clean install'
                   }
             }
         stage('Build Docker image'){
@@ -48,12 +48,12 @@ pipeline {
         }
         stage('Docker Push'){
             steps {
-                bat 'docker push sainitin18/driveawaybackend'
+                sh 'docker push sainitin18/driveawaybackend'
             }
         }
         stage('Docker deploy'){
             steps {
-                bat 'docker run -itd -p  8085:8085 driveawaybackend'
+                sh 'docker run -itd -p  8085:8085 driveawaybackend'
              }
         }
     
