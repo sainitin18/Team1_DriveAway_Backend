@@ -114,8 +114,6 @@ public class UserController {
         }
     }
 
-
-    
     @GetMapping("/pendingUsers")
     public ResponseEntity<?> getPendingUsers() {
         List<UserDTO> pendingUsers = userService.getNewUsers();

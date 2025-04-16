@@ -158,7 +158,7 @@ public class RentalServiceImplTest {
         rental.setRentalStatus("ACCEPTED CAR FOR RIDE");
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> 
                 rentalService.updateRentalStatus(1L, "USER CANCELLED"));
 
         assertEquals("Booking cannot be cancelled as it is already Approved or Ongoing.", ex.getMessage());
@@ -175,7 +175,7 @@ public class RentalServiceImplTest {
     void testUpdateRentalStatus_Unsupported() {
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(rental));
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> 
                 rentalService.updateRentalStatus(1L, "INVALID STATUS"));
 
         assertEquals("Unsupported rental status: INVALID STATUS", ex.getMessage());
@@ -216,7 +216,7 @@ public class RentalServiceImplTest {
     void testDeleteRental_NotFound() {
         when(rentalRepository.findById(1L)).thenReturn(Optional.empty());
 
-        RuntimeException ex = assertThrows(RuntimeException.class, () ->
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> 
                 rentalService.deleteRental(1L));
 
         assertEquals("Rental with ID 1 not found", ex.getMessage());
@@ -229,5 +229,15 @@ public class RentalServiceImplTest {
         int count = rentalService.getRentalCountByStatus("PENDING");
 
         assertEquals(5, count);
+    }
+
+    // Add test for the getUserBookings() method when no rentals are found
+    @Test
+    void testGetUserBookings_NoRentals() {
+        when(rentalRepository.findByUserId(1L)).thenReturn(List.of());
+
+        List<UserBookingDTO> result = rentalService.getUserBookings(1L);
+
+        assertTrue(result.isEmpty());
     }
 }

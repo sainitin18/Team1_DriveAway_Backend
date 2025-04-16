@@ -5,6 +5,7 @@ import com.DriveAway.project.exception.UserNotFoundException;
 import com.DriveAway.project.model.User;
 import com.DriveAway.project.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ public class UserControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    // --- Helper Methods ---
+
     private UserDTO getSampleUserDTO() {
         UserDTO userDTO = new UserDTO();
         userDTO.setEmail("john@example.com");
@@ -52,8 +55,8 @@ public class UserControllerTest {
         address.setState("State");
         address.setPostalCode("123456");
         address.setCountry("India");
-
         userDTO.setAddress(address);
+
         return userDTO;
     }
 
@@ -77,6 +80,8 @@ public class UserControllerTest {
         return dto;
     }
 
+    // --- Register User ---
+
     @Test
     @DisplayName("Register User - Success")
     void testRegisterUser() throws Exception {
@@ -98,13 +103,15 @@ public class UserControllerTest {
     @Test
     @DisplayName("Register User - Validation Failure")
     void testRegisterUser_InvalidInput() throws Exception {
-        UserDTO invalidUser = new UserDTO(); // empty userDTO
+        UserDTO invalidUser = new UserDTO(); // no fields set
 
         mockMvc.perform(post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidUser)))
                 .andExpect(status().isBadRequest());
     }
+
+    // --- Get User By ID / Email ---
 
     @Test
     @DisplayName("Get User By ID")
@@ -128,6 +135,8 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email").value("john@example.com"));
     }
 
+    // --- Get All Users ---
+
     @Test
     @DisplayName("Get All Users")
     void testGetAllUsers() throws Exception {
@@ -139,6 +148,8 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].email").value("john@example.com"));
     }
+
+    // --- Update / Delete User ---
 
     @Test
     @DisplayName("Update User")
@@ -167,14 +178,16 @@ public class UserControllerTest {
                 .andExpect(content().string("User deleted successfully"));
     }
 
+    // --- Login ---
+
     @Test
-    @DisplayName("Login Success")
+    @DisplayName("Login - Success")
     void testLoginSuccess() throws Exception {
         UserLoginDTO loginDTO = new UserLoginDTO();
         loginDTO.setEmail("john@example.com");
         loginDTO.setPassword("Password@123");
 
-        AuthResponseDTO authResponse = new AuthResponseDTO(1L, "John", "USER","john@example.com");
+        AuthResponseDTO authResponse = new AuthResponseDTO(1L, "John", "USER", "john@example.com");
 
         when(userService.authenticateUser(anyString(), anyString())).thenReturn(authResponse);
 
@@ -185,8 +198,7 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.userId").value(1))
                 .andExpect(jsonPath("$.userName").value("John"))
                 .andExpect(jsonPath("$.role").value("USER"))
-        		.andExpect(jsonPath("$.email").value("john@example.com"));
-        
+                .andExpect(jsonPath("$.email").value("john@example.com"));
     }
 
     @Test
@@ -206,8 +218,10 @@ public class UserControllerTest {
                 .andExpect(content().string("User not found"));
     }
 
+    // --- Pending Users ---
+
     @Test
-    @DisplayName("Get Pending Users")
+    @DisplayName("Get Pending Users - With Results")
     void testGetPendingUsers() throws Exception {
         UserDTO userDTO = getSampleUserDTO();
         when(userService.getNewUsers()).thenReturn(List.of(userDTO));
@@ -216,6 +230,18 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].email").value("john@example.com"));
     }
+
+    @Test
+    @DisplayName("Get Pending Users - Empty List")
+    void testGetPendingUsers_Empty() throws Exception {
+        when(userService.getNewUsers()).thenReturn(List.of());
+
+        mockMvc.perform(get("/users/pendingUsers"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("No new users pending approval."));
+    }
+
+    // --- Update User Status ---
 
     @Test
     @DisplayName("Update User Status - Success")
@@ -247,6 +273,8 @@ public class UserControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("User not found"));
     }
+
+    // --- Forgot Password ---
 
     @Test
     @DisplayName("Forgot Password")
