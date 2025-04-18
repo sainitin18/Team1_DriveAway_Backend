@@ -37,7 +37,7 @@ class VehicleServiceImplTest {
     private VehicleDTO vehicleDTO;
     private Vehicle vehicle;
     private CarFeatureDTO carFeatureDTO;
-
+//Test common data
     @BeforeEach
     void setup() {
         vehicleDTO = new VehicleDTO();
